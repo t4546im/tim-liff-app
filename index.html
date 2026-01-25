@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提姆任務管理</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 15px; background: #f0f2f5; }
+        .section { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #00b900; font-size: 18px; margin-top: 0; }
+        input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #00b900; color: white; font-weight: bold; border: none; cursor: pointer; }
+        .task-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .task-info { font-size: 14px; }
+        .task-time { font-size: 11px; color: #888; }
+        .del-btn { background: #ff4d4d; width: auto; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <h2>➕ 新增提醒事項</h2>
+        <input type="text" id="taskInput" placeholder="要做什麼事？">
+        <input type="datetime-local" id="timeInput">
+        <button onclick="addTask()">存入提姆筆記本</button>
+    </div>
+
+    <div class="section">
+        <h2>🗓️ 待執行任務</h2>
+        <div id="pendingTasks">載入中...</div>
+    </div>
+
+    <div class="section">
+        <h2 style="color: #666;">📜 歷史紀錄</h2>
+        <div id="historyTasks" style="opacity: 0.6;"></div>
+    </div>
+
+    <script>
+        const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; // 這裡換成階段三的網址
+        let userId = "";
+
+        async function initLIFF() {
+            await liff.init({ liffId: "2008963829-tIljVU3d" }); // 這裡換成階段二的 ID
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
+                const profile = await liff.getProfile();
+                userId = profile.userId;
+                fetchTasks();
+            }
+        }
+
+        async function fetchTasks() {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "get_tasks", user_id: userId })
+            });
+            const data = await res.json();
+            renderTasks(data);
+        }
+
+        function renderTasks(tasks) {
+            const pendingDiv = document.getElementById('pendingTasks');
+            const historyDiv = document.getElementById('historyTasks');
+            pendingDiv.innerHTML = ""; historyDiv.innerHTML = "";
+
+            tasks.forEach(t => {
+                const html = `
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div>${t.task}</div>
+                            <div class="task-time">${t.remind_at}</div>
+                        </div>
+                        ${t.status === 'pending' ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
+                    </div>`;
+                if (t.status === 'pending') pendingDiv.innerHTML += html;
+                else historyDiv.innerHTML += html;
+            });
+        }
+
+        async function addTask() {
+            const task = document.getElementById('taskInput').value;
+            const time = document.getElementById('timeInput').value.replace('T', ' ') + ":00";
+            if (!task || !time) return alert("請填寫內容與時間");
+            
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: time })
+            });
+            location.reload();
+        }
+
+        async function deleteTask(id) {
+            if (!confirm("確定要刪除嗎？")) return;
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "delete_task", task_id: id })
+            });
+            fetchTasks();
+        }
+
+        initLIFF();
+    </script>
+</body>
+</html>
