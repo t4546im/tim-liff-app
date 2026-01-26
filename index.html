@@ -97,13 +97,38 @@
         }
     }
 
+    // function renderTasks(tasks, elementId, showDelete) {
+    //     const list = document.getElementById(elementId);
+    //     if (!tasks || tasks.length === 0) {
+    //         list.innerHTML = '<div class="no-task">目前沒有任務</div>';
+    //         return;
+    //     }
     function renderTasks(tasks, elementId, showDelete) {
+        console.log(`正在渲染 ${elementId}，資料內容為：`, tasks); // 這一行能讓你看到真相
+    
         const list = document.getElementById(elementId);
-        if (!tasks || tasks.length === 0) {
+        
+        // 如果 tasks 不是陣列，直接顯示「資料格式錯誤」並跳出，不要執行 map
+        if (!Array.isArray(tasks)) {
+            list.innerHTML = '<div class="no-task">資料格式不正確</div>';
+            return;
+        }
+    
+        if (tasks.length === 0) {
             list.innerHTML = '<div class="no-task">目前沒有任務</div>';
             return;
         }
-
+    
+        list.innerHTML = tasks.map(t => `
+            <div class="task-item ${!showDelete ? 'history-item' : ''}">
+                <div class="task-info">
+                    <div style="font-weight:bold;">${t.task}</div>
+                    <div class="task-time">${t.remind_at}</div>
+                </div>
+                ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
+            </div>
+        `).join('');
+    }
         list.innerHTML = tasks.map(t => `
             <div class="task-item ${!showDelete ? 'history-item' : ''}">
                 <div class="task-info">
