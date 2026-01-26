@@ -77,19 +77,37 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: "get_tasks", user_id: userId })
             });
-            const data = await res.json();
-            console.log("GCP 回傳內容：", data);
-            
-            if (data.pending && data.history) {
-                renderTasks(data.pending, "pending-list", true);
-                renderTasks(data.history, "history-list", false);
+    
+            // 診斷步驟 1：先檢查 HTTP 狀態碼
+            if (!res.ok) {
+                console.error("GCP 連線失敗，狀態碼：", res.status);
+                document.getElementById('pending-list').innerHTML = `連線失敗 (${res.status})`;
+                return;
             }
+    
+            const data = await res.json();
+            
+            // 診斷步驟 2：印出完整資料，這在 F12 視窗非常重要！
+            console.log("=== 提姆診斷報告 ===");
+            console.log("GCP 回傳的原始資料：", data);
+    
+            // 診斷步驟 3：防呆處理
+            const pending = Array.isArray(data.pending) ? data.pending : [];
+            const history = Array.isArray(data.history) ? data.history : [];
+    
+            if (data.error) {
+                console.error("GCP 內部錯誤：", data.error);
+                document.getElementById('pending-list').innerHTML = `後端錯誤: ${data.error}`;
+            }
+    
+            renderTasks(pending, "pending-list", true);
+            renderTasks(history, "history-list", false);
+    
         } catch (err) {
-            console.error("抓取失敗", err);
-            document.getElementById('pending-list').innerHTML = "連線失敗，請檢查網路。";
+            console.error("Fetch 過程發生嚴重錯誤：", err);
+            document.getElementById('pending-list').innerHTML = "系統無法連線至提姆。";
         }
     }
-
     function renderTasks(tasks, elementId, showDelete) {
         const list = document.getElementById(elementId);
         
