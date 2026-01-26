@@ -129,16 +129,16 @@
             </div>
         `).join('');
     }
-        list.innerHTML = tasks.map(t => `
-            <div class="task-item ${!showDelete ? 'history-item' : ''}">
-                <div class="task-info">
-                    <div style="font-weight:bold;">${t.task}</div>
-                    <div class="task-time">${t.remind_at}</div>
-                </div>
-                ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
-            </div>
-        `).join('');
-    }
+    //     list.innerHTML = tasks.map(t => `
+    //         <div class="task-item ${!showDelete ? 'history-item' : ''}">
+    //             <div class="task-info">
+    //                 <div style="font-weight:bold;">${t.task}</div>
+    //                 <div class="task-time">${t.remind_at}</div>
+    //             </div>
+    //             ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
+    //         </div>
+    //     `).join('');
+    // }
 
     async function addTask() {
         const task = document.getElementById('taskInput').value;
