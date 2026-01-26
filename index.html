@@ -11,20 +11,15 @@
         .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h2 { color: var(--primary-color); text-align: center; margin-bottom: 25px; }
         h3 { border-left: 4px solid var(--primary-color); padding-left: 10px; margin-top: 30px; font-size: 1.1em; }
-        
-        /* 表單樣式 */
         .form-group { margin-bottom: 15px; }
         input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         button.add-btn { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        /* 任務列表樣式 */
         .task-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
         .task-info { flex-grow: 1; }
         .task-time { font-size: 0.85em; color: #888; margin-top: 4px; }
         .del-btn { background: #ff4d4f; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.9em; cursor: pointer; margin-left: 10px; }
         .no-task { color: #aaa; text-align: center; padding: 20px; font-size: 0.9em; }
         .history-item { opacity: 0.7; }
-        
         #user-info { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; }
         #user-info img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
     </style>
@@ -51,7 +46,6 @@
 </div>
 
 <script>
-    // --- 這裡請替換成你的設定 ---
     const LIFF_ID = "2008963829-tIljVU3d"; 
     const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; 
 
@@ -73,7 +67,6 @@
             }
         } catch (err) {
             console.error("LIFF 初始化失敗", err);
-            document.getElementById('pending-list').innerHTML = "初始化失敗，請在 LINE 中開啟。";
         }
     }
 
@@ -85,7 +78,7 @@
                 body: JSON.stringify({ action: "get_tasks", user_id: userId })
             });
             const data = await res.json();
-            console.log("從GCP拿到的資料：", data);
+            console.log("GCP 回傳內容：", data);
             
             if (data.pending && data.history) {
                 renderTasks(data.pending, "pending-list", true);
@@ -93,32 +86,18 @@
             }
         } catch (err) {
             console.error("抓取失敗", err);
-            document.getElementById('pending-list').innerHTML = "連線不到提姆，請檢查網址與網路。";
+            document.getElementById('pending-list').innerHTML = "連線失敗，請檢查網路。";
         }
     }
 
-    // function renderTasks(tasks, elementId, showDelete) {
-    //     const list = document.getElementById(elementId);
-    //     if (!tasks || tasks.length === 0) {
-    //         list.innerHTML = '<div class="no-task">目前沒有任務</div>';
-    //         return;
-    //     }
     function renderTasks(tasks, elementId, showDelete) {
-        console.log(`正在渲染 ${elementId}，資料內容為：`, tasks); // 這一行能讓你看到真相
-    
         const list = document.getElementById(elementId);
         
-        // 如果 tasks 不是陣列，直接顯示「資料格式錯誤」並跳出，不要執行 map
-        if (!Array.isArray(tasks)) {
-            list.innerHTML = '<div class="no-task">資料格式不正確</div>';
-            return;
-        }
-    
-        if (tasks.length === 0) {
+        if (!Array.isArray(tasks) || tasks.length === 0) {
             list.innerHTML = '<div class="no-task">目前沒有任務</div>';
             return;
         }
-    
+
         list.innerHTML = tasks.map(t => `
             <div class="task-item ${!showDelete ? 'history-item' : ''}">
                 <div class="task-info">
@@ -129,34 +108,17 @@
             </div>
         `).join('');
     }
-    //     list.innerHTML = tasks.map(t => `
-    //         <div class="task-item ${!showDelete ? 'history-item' : ''}">
-    //             <div class="task-info">
-    //                 <div style="font-weight:bold;">${t.task}</div>
-    //                 <div class="task-time">${t.remind_at}</div>
-    //             </div>
-    //             ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
-    //         </div>
-    //     `).join('');
-    // }
 
     async function addTask() {
         const task = document.getElementById('taskInput').value;
         const timeInput = document.getElementById('timeInput').value;
         if (!task || !timeInput) return alert("請填寫任務與時間！");
 
-        // 轉換格式為 YYYY-MM-DD HH:mm:ss
         const formattedTime = timeInput.replace('T', ' ') + ':00';
-
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: "add_task",
-                user_id: userId,
-                task: task,
-                remind_at: formattedTime
-            })
+            body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: formattedTime })
         });
 
         const result = await res.json();
@@ -165,27 +127,20 @@
             document.getElementById('taskInput').value = "";
             document.getElementById('timeInput').value = "";
             fetchTasks();
-        } else {
-            alert("儲存失敗：" + result.error);
         }
     }
 
     async function deleteTask(id) {
         if (!confirm("確定要移除這個提醒嗎？")) return;
-        
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
         });
-        
         const result = await res.json();
-        if (result.status === "success") {
-            fetchTasks();
-        }
+        if (result.status === "success") fetchTasks();
     }
 
-    // 啟動！
     initLIFF();
 </script>
 </body>
