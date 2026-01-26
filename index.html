@@ -81,25 +81,24 @@
             const data = await res.json();
             
             // 1. 在 Console 印出真相 (這非常重要！)
-            console.log("=== 提姆收到的原始資料 ===");
-            console.log(data);
+            console.log("提姆收到的原始資料:", data);
             
-            // 2. 防呆處理：如果 data.pending 不是陣列，就給它空陣列 []
-            // 這行能解決 "tasks.forEach is not a function" 的報錯
+            // 2. 防呆處理：確保傳入 renderTasks 的一定是陣列
+            // 如果 data.pending 不是陣列，就給它一個空陣列 []，防止 forEach 報錯
             const pending = Array.isArray(data.pending) ? data.pending : [];
             const history = Array.isArray(data.history) ? data.history : [];
     
-            // 3. 渲染畫面
+            // 3. 分別渲染兩個區塊
             renderTasks(pending, "pending-list", true);
             renderTasks(history, "history-list", false);
     
             if (data.error) {
-                console.error("GCP 後端回報錯誤:", data.error);
+                console.error("GCP 後端報錯:", data.error);
             }
     
         } catch (err) {
-            console.error("連線或解析失敗:", err);
-            document.getElementById('pending-list').innerHTML = "資料讀取失敗，請確認 GCP 是否啟動。";
+            console.error("Fetch 失敗:", err);
+            document.getElementById('pending-list').innerHTML = "連線失敗，請稍後再試。";
         }
     }
     function renderTasks(tasks, elementId, showDelete) {
