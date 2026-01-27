@@ -49,30 +49,32 @@
     const LIFF_ID = "2008963829-tIljVU3d"; 
     const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; 
 
-    let userId = "";
+let userId = ""; // 全域變數
 
     async function initLIFF() {
         try {
+            console.log("1. 開始初始化 LIFF");
             await liff.init({ liffId: LIFF_ID });
+            
             if (!liff.isLoggedIn()) {
+                console.log("2. 使用者未登入，引導登入");
                 liff.login();
             } else {
+                console.log("2. 已登入，開始獲取 Profile");
                 const profile = await liff.getProfile();
                 
-                // 關鍵點 1：先存進全域變數
+                // 關鍵：確保這裡拿到值了
                 userId = profile.userId; 
-                console.log("✅ 成功取得 LINE UID:", userId);
+                console.log("3. 成功取得 UID:", userId);
 
                 document.getElementById('user-info').innerHTML = `
                     <img src="${profile.pictureUrl}" alt="icon">
                     <span>哈囉，${profile.displayName}！</span>
                 `;
                 
-                // 關鍵點 2：確定有 userId 了才去抓資料
+                // 關鍵：一定要有 ID 才呼叫，且使用 await 確保順序
                 if (userId) {
-                    fetchTasks();
-                } else {
-                    console.error("❌ 無法取得 userId");
+                    await fetchTasks();
                 }
             }
         } catch (err) {
@@ -81,34 +83,30 @@
     }
 
     async function fetchTasks() {
+        // 防呆：如果進來時沒 ID，直接攔截，不讓它去敲 GCP
+        if (!userId) {
+            console.warn("fetchTasks 被攔截：userId 尚未準備好");
+            return;
+        }
+
         try {
             const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: "get_tasks", user_id: userId })
             });
-            const data = await res.json();
             
-            // --- 診斷專區：在瀏覽器 F12 視窗看真相 ---
-            console.log("=== 提姆診斷回報 ===");
-            console.log("原始回傳內容:", data);
-    
-            // 如果後端回報錯誤，直接顯示在畫面上
-            if (data.error) {
-                console.error("GCP 後端錯誤:", data.error);
-                document.getElementById('pending-list').innerHTML = `<div class="no-task">後端錯誤: ${data.error}</div>`;
-                return;
-            }
-    
-            // 強制確保傳進去的是陣列，如果 data.pending 不存在，就給空陣列 []
-            const pending = Array.isArray(data.pending) ? data.pending : [];
-            const history = Array.isArray(data.history) ? data.history : [];
-    
+            const data = await res.json();
+            console.log("4. GCP 回傳成功：", data);
+            
+            // 強制確保傳進去的是陣列 (對付 "Missing user_id" 的回傳物件)
+            const pending = (data && Array.isArray(data.pending)) ? data.pending : [];
+            const history = (data && Array.isArray(data.history)) ? data.history : [];
+
             renderTasks(pending, "pending-list", true);
             renderTasks(history, "history-list", false);
         } catch (err) {
-            console.error("Fetch 失敗:", err);
-            document.getElementById('pending-list').innerHTML = "連線不到提姆，請檢查 API URL。";
+            console.error("抓取失敗", err);
         }
     }
 
