@@ -101,24 +101,32 @@
             document.getElementById('pending-list').innerHTML = "連線失敗，請稍後再試。";
         }
     }
-    function renderTasks(tasks, elementId, showDelete) {
-        const list = document.getElementById(elementId);
-        
-        if (!Array.isArray(tasks) || tasks.length === 0) {
-            list.innerHTML = '<div class="no-task">目前沒有任務</div>';
-            return;
-        }
 
-        list.innerHTML = tasks.map(t => `
-            <div class="task-item ${!showDelete ? 'history-item' : ''}">
-                <div class="task-info">
-                    <div style="font-weight:bold;">${t.task}</div>
-                    <div class="task-time">${t.remind_at}</div>
-                </div>
-                ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
-            </div>
-        `).join('');
+function renderTasks(tasks, elementId, showDelete) {
+    const list = document.getElementById(elementId);
+    
+    // 關鍵防線：如果 tasks 不是陣列，就強迫它變成空陣列，並在 Console 印出內容
+    if (!Array.isArray(tasks)) {
+        console.error(`${elementId} 接收到的資料不是陣列：`, tasks);
+        list.innerHTML = '<div class="no-task">暫無資料或格式錯誤</div>';
+        return;
     }
+
+    if (tasks.length === 0) {
+        list.innerHTML = '<div class="no-task">目前沒有任務</div>';
+        return;
+    }
+
+    list.innerHTML = tasks.map(t => `
+        <div class="task-item ${!showDelete ? 'history-item' : ''}">
+            <div class="task-info">
+                <div style="font-weight:bold;">${t.task}</div>
+                <div class="task-time">${t.remind_at}</div>
+            </div>
+            ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
+        </div>
+    `).join('');
+}
 
     async function addTask() {
         const task = document.getElementById('taskInput').value;
