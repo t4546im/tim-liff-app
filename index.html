@@ -58,16 +58,25 @@
                 liff.login();
             } else {
                 const profile = await liff.getProfile();
-                userId = profile.userId;
+                
+                // 關鍵點 1：先存進全域變數
+                userId = profile.userId; 
+                console.log("✅ 成功取得 LINE UID:", userId);
+
                 document.getElementById('user-info').innerHTML = `
                     <img src="${profile.pictureUrl}" alt="icon">
                     <span>哈囉，${profile.displayName}！</span>
                 `;
-                fetchTasks();
+                
+                // 關鍵點 2：確定有 userId 了才去抓資料
+                if (userId) {
+                    fetchTasks();
+                } else {
+                    console.error("❌ 無法取得 userId");
+                }
             }
         } catch (err) {
             console.error("LIFF 初始化失敗", err);
-            document.getElementById('pending-list').innerHTML = "初始化失敗。";
         }
     }
 
