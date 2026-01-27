@@ -67,6 +67,7 @@
             }
         } catch (err) {
             console.error("LIFF 初始化失敗", err);
+            document.getElementById('pending-list').innerHTML = "初始化失敗。";
         }
     }
 
@@ -77,87 +78,86 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: "get_tasks", user_id: userId })
             });
-            
             const data = await res.json();
             
-            // 1. 在 Console 印出真相 (這非常重要！)
-            console.log("提姆收到的原始資料:", data);
+            console.log("=== 提姆收到的原始資料 ===", data);
             
-            // 2. 防呆處理：確保傳入 renderTasks 的一定是陣列
-            // 如果 data.pending 不是陣列，就給它一個空陣列 []，防止 forEach 報錯
-            const pending = Array.isArray(data.pending) ? data.pending : [];
-            const history = Array.isArray(data.history) ? data.history : [];
-    
-            // 3. 分別渲染兩個區塊
+            const pending = (data && Array.isArray(data.pending)) ? data.pending : [];
+            const history = (data && Array.isArray(data.history)) ? data.history : [];
+
             renderTasks(pending, "pending-list", true);
             renderTasks(history, "history-list", false);
-    
-            if (data.error) {
-                console.error("GCP 後端報錯:", data.error);
-            }
-    
+
+            if (data.error) console.error("GCP 後端回報錯誤:", data.error);
         } catch (err) {
-            console.error("Fetch 失敗:", err);
-            document.getElementById('pending-list').innerHTML = "連線失敗，請稍後再試。";
+            console.error("抓取失敗", err);
+            document.getElementById('pending-list').innerHTML = "資料讀取失敗，請確認 API URL。";
         }
     }
 
-function renderTasks(tasks, elementId, showDelete) {
-    const list = document.getElementById(elementId);
-    
-    // 關鍵防線：如果 tasks 不是陣列，就強迫它變成空陣列，並在 Console 印出內容
-    if (!Array.isArray(tasks)) {
-        console.error(`${elementId} 接收到的資料不是陣列：`, tasks);
-        list.innerHTML = '<div class="no-task">暫無資料或格式錯誤</div>';
-        return;
-    }
+    function renderTasks(tasks, elementId, showDelete) {
+        const list = document.getElementById(elementId);
+        
+        if (!Array.isArray(tasks)) {
+            console.error(`${elementId} 資料非陣列：`, tasks);
+            list.innerHTML = '<div class="no-task">暫無資料</div>';
+            return;
+        }
 
-    if (tasks.length === 0) {
-        list.innerHTML = '<div class="no-task">目前沒有任務</div>';
-        return;
-    }
+        if (tasks.length === 0) {
+            list.innerHTML = '<div class="no-task">目前沒有任務</div>';
+            return;
+        }
 
-    list.innerHTML = tasks.map(t => `
-        <div class="task-item ${!showDelete ? 'history-item' : ''}">
-            <div class="task-info">
-                <div style="font-weight:bold;">${t.task}</div>
-                <div class="task-time">${t.remind_at}</div>
+        list.innerHTML = tasks.map(t => `
+            <div class="task-item ${!showDelete ? 'history-item' : ''}">
+                <div class="task-info">
+                    <div style="font-weight:bold;">${t.task}</div>
+                    <div class="task-time">${t.remind_at}</div>
+                </div>
+                ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
             </div>
-            ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
-        </div>
-    `).join('');
-}
+        `).join('');
+    }
 
     async function addTask() {
         const task = document.getElementById('taskInput').value;
         const timeInput = document.getElementById('timeInput').value;
         if (!task || !timeInput) return alert("請填寫任務與時間！");
 
-        const formattedTime = timeInput.replace('T', ' ') + ':00';
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: formattedTime })
-        });
+        try {
+            const formattedTime = timeInput.replace('T', ' ') + ':00';
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: formattedTime })
+            });
 
-        const result = await res.json();
-        if (result.status === "success") {
-            alert("提姆記下來了！");
-            document.getElementById('taskInput').value = "";
-            document.getElementById('timeInput').value = "";
-            fetchTasks();
+            const result = await res.json();
+            if (result.status === "success") {
+                alert("提姆記下來了！");
+                document.getElementById('taskInput').value = "";
+                document.getElementById('timeInput').value = "";
+                fetchTasks();
+            }
+        } catch (err) {
+            alert("新增失敗，請檢查網路連線。");
         }
     }
 
     async function deleteTask(id) {
         if (!confirm("確定要移除這個提醒嗎？")) return;
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
-        });
-        const result = await res.json();
-        if (result.status === "success") fetchTasks();
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
+            });
+            const result = await res.json();
+            if (result.status === "success") fetchTasks();
+        } catch (err) {
+            alert("刪除失敗。");
+        }
     }
 
     initLIFF();
