@@ -1,93 +1,36 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>提姆的任務管理後台</title>
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <style>
-        :root { --primary-color: #4a90e2; --bg-color: #f5f7fa; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg-color); padding: 20px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { color: var(--primary-color); text-align: center; margin-bottom: 25px; }
-        h3 { border-left: 4px solid var(--primary-color); padding-left: 10px; margin-top: 30px; font-size: 1.1em; }
-        .form-group { margin-bottom: 15px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button.add-btn { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .task-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
-        .task-info { flex-grow: 1; }
-        .task-time { font-size: 0.85em; color: #888; margin-top: 4px; }
-        .del-btn { background: #ff4d4f; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.9em; cursor: pointer; margin-left: 10px; }
-        .no-task { color: #aaa; text-align: center; padding: 20px; font-size: 0.9em; }
-        .history-item { opacity: 0.7; }
-        #user-info { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; }
-        #user-info img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div id="user-info">載入使用者資訊中...</div>
-    <h2>提姆筆記本管理</h2>
-
-    <div class="form-group">
-        <input type="text" id="taskInput" placeholder="想提醒什麼？">
-    </div>
-    <div class="form-group">
-        <input type="datetime-local" id="timeInput">
-    </div>
-    <button class="add-btn" onclick="addTask()">存入提姆筆記本</button>
-
-    <h3>📌 待執行提醒</h3>
-    <div id="pending-list">讀取中...</div>
-
-    <h3>🕰️ 歷史紀錄 (最近10筆)</h3>
-    <div id="history-list">讀取中...</div>
-</div>
-
 <script>
     const LIFF_ID = "2008963829-tIljVU3d"; 
     const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; 
 
-let userId = ""; // 全域變數
+    let userId = "";
+
+    // 啟動點
+    window.onload = () => {
+        initLIFF();
+    };
 
     async function initLIFF() {
         try {
-            console.log("1. 開始初始化 LIFF");
             await liff.init({ liffId: LIFF_ID });
-            
             if (!liff.isLoggedIn()) {
-                console.log("2. 使用者未登入，引導登入");
                 liff.login();
             } else {
-                console.log("2. 已登入，開始獲取 Profile");
                 const profile = await liff.getProfile();
-                
-                // 關鍵：確保這裡拿到值了
-                userId = profile.userId; 
-                console.log("3. 成功取得 UID:", userId);
-
+                userId = profile.userId;
                 document.getElementById('user-info').innerHTML = `
                     <img src="${profile.pictureUrl}" alt="icon">
                     <span>哈囉，${profile.displayName}！</span>
                 `;
-                
-                // 關鍵：一定要有 ID 才呼叫，且使用 await 確保順序
-                if (userId) {
-                    await fetchTasks();
-                }
+                // 確保拿到 ID 後才執行
+                if (userId) fetchTasks();
             }
         } catch (err) {
-            console.error("LIFF 初始化失敗", err);
+            console.error("LIFF 載入失敗", err);
         }
     }
 
     async function fetchTasks() {
-        // 防呆：如果進來時沒 ID，直接攔截，不讓它去敲 GCP
-        if (!userId) {
-            console.warn("fetchTasks 被攔截：userId 尚未準備好");
-            return;
-        }
+        if (!userId) return;
 
         try {
             const res = await fetch(API_URL, {
@@ -95,88 +38,78 @@ let userId = ""; // 全域變數
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: "get_tasks", user_id: userId })
             });
-            
-            const data = await res.json();
-            console.log("4. GCP 回傳成功：", data);
-            
-            // 強制確保傳進去的是陣列 (對付 "Missing user_id" 的回傳物件)
+
+            // 先拿純文字，防止 JSON 解析失敗
+            const raw = await res.text();
+            console.log("GCP 原始回傳：", raw);
+
+            let data;
+            try {
+                data = JSON.parse(raw);
+            } catch (e) {
+                console.error("JSON 解析失敗，回傳內容不是 JSON");
+                return;
+            }
+
+            // 【防彈核心】：如果 data 不是陣列也不是我們要的格式，就給預設值
+            // 就算後端回傳 {"debug": "..."}, 這裡也會安全轉成空陣列
             const pending = (data && Array.isArray(data.pending)) ? data.pending : [];
             const history = (data && Array.isArray(data.history)) ? data.history : [];
 
             renderTasks(pending, "pending-list", true);
             renderTasks(history, "history-list", false);
+
         } catch (err) {
-            console.error("抓取失敗", err);
+            console.error("網路連線錯誤:", err);
         }
     }
 
     function renderTasks(tasks, elementId, showDelete) {
         const list = document.getElementById(elementId);
         
-        // --- 關鍵防線 1：確保 tasks 存在且是陣列 ---
-        // 如果 tasks 是 null, undefined 或不是陣列，就把它變回空陣列 []
+        // 【防彈核心 2】：確保進來的一定是陣列，不然 map() 會崩潰
         const safeTasks = Array.isArray(tasks) ? tasks : [];
-    
-        console.log(`[渲染檢查] ${elementId} 內容:`, safeTasks);
-    
-        // --- 關鍵防線 2：如果陣列是空的，顯示提示文字後跳出 ---
+
         if (safeTasks.length === 0) {
             list.innerHTML = '<div class="no-task">目前沒有任務</div>';
             return;
         }
-    
-        // --- 關鍵防線 3：只有確定是陣列且有資料，才執行 map ---
+
         list.innerHTML = safeTasks.map(t => `
             <div class="task-item ${!showDelete ? 'history-item' : ''}">
                 <div class="task-info">
-                    <div style="font-weight:bold;">${t.task || '未命名任務'}</div>
+                    <div style="font-weight:bold;">${t.task || '無標題'}</div>
                     <div class="task-time">${t.remind_at || '時間未知'}</div>
                 </div>
                 ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
             </div>
         `).join('');
     }
+
     async function addTask() {
         const task = document.getElementById('taskInput').value;
         const timeInput = document.getElementById('timeInput').value;
-        if (!task || !timeInput) return alert("請填寫任務與時間！");
+        if (!task || !timeInput || !userId) return alert("資訊不完整");
 
-        try {
-            const formattedTime = timeInput.replace('T', ' ') + ':00';
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: formattedTime })
-            });
-
-            const result = await res.json();
-            if (result.status === "success") {
-                alert("提姆記下來了！");
-                document.getElementById('taskInput').value = "";
-                document.getElementById('timeInput').value = "";
-                fetchTasks();
-            }
-        } catch (err) {
-            alert("新增失敗，請檢查網路連線。");
-        }
+        const formattedTime = timeInput.replace('T', ' ') + ':00';
+        
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: formattedTime })
+        });
+        
+        document.getElementById('taskInput').value = "";
+        fetchTasks();
     }
 
     async function deleteTask(id) {
-        if (!confirm("確定要移除這個提醒嗎？")) return;
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
-            });
-            const result = await res.json();
-            if (result.status === "success") fetchTasks();
-        } catch (err) {
-            alert("刪除失敗。");
-        }
+        if (!confirm("確定要移除嗎？") || !userId) return;
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
+        });
+        fetchTasks();
     }
-
-    initLIFF();
 </script>
-</body>
-</html>
