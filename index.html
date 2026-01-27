@@ -115,23 +115,24 @@
     function renderTasks(tasks, elementId, showDelete) {
         const list = document.getElementById(elementId);
         
-        // 雙重保險：如果 tasks 真的不是陣列，就顯示暫無資料
-        if (!Array.isArray(tasks)) {
-            console.warn(`${elementId} 接收到的資料不是陣列:`, tasks);
-            list.innerHTML = '<div class="no-task">暫無資料</div>';
-            return;
-        }
+        // --- 關鍵防線 1：確保 tasks 存在且是陣列 ---
+        // 如果 tasks 是 null, undefined 或不是陣列，就把它變回空陣列 []
+        const safeTasks = Array.isArray(tasks) ? tasks : [];
     
-        if (tasks.length === 0) {
+        console.log(`[渲染檢查] ${elementId} 內容:`, safeTasks);
+    
+        // --- 關鍵防線 2：如果陣列是空的，顯示提示文字後跳出 ---
+        if (safeTasks.length === 0) {
             list.innerHTML = '<div class="no-task">目前沒有任務</div>';
             return;
         }
     
-        list.innerHTML = tasks.map(t => `
+        // --- 關鍵防線 3：只有確定是陣列且有資料，才執行 map ---
+        list.innerHTML = safeTasks.map(t => `
             <div class="task-item ${!showDelete ? 'history-item' : ''}">
                 <div class="task-info">
-                    <div style="font-weight:bold;">${t.task}</div>
-                    <div class="task-time">${t.remind_at}</div>
+                    <div style="font-weight:bold;">${t.task || '未命名任務'}</div>
+                    <div class="task-time">${t.remind_at || '時間未知'}</div>
                 </div>
                 ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
             </div>
