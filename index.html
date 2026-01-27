@@ -80,35 +80,44 @@
             });
             const data = await res.json();
             
-            console.log("=== 提姆收到的原始資料 ===", data);
-            
-            const pending = (data && Array.isArray(data.pending)) ? data.pending : [];
-            const history = (data && Array.isArray(data.history)) ? data.history : [];
-
+            // --- 診斷專區：在瀏覽器 F12 視窗看真相 ---
+            console.log("=== 提姆診斷回報 ===");
+            console.log("原始回傳內容:", data);
+    
+            // 如果後端回報錯誤，直接顯示在畫面上
+            if (data.error) {
+                console.error("GCP 後端錯誤:", data.error);
+                document.getElementById('pending-list').innerHTML = `<div class="no-task">後端錯誤: ${data.error}</div>`;
+                return;
+            }
+    
+            // 強制確保傳進去的是陣列，如果 data.pending 不存在，就給空陣列 []
+            const pending = Array.isArray(data.pending) ? data.pending : [];
+            const history = Array.isArray(data.history) ? data.history : [];
+    
             renderTasks(pending, "pending-list", true);
             renderTasks(history, "history-list", false);
-
-            if (data.error) console.error("GCP 後端回報錯誤:", data.error);
         } catch (err) {
-            console.error("抓取失敗", err);
-            document.getElementById('pending-list').innerHTML = "資料讀取失敗，請確認 API URL。";
+            console.error("Fetch 失敗:", err);
+            document.getElementById('pending-list').innerHTML = "連線不到提姆，請檢查 API URL。";
         }
     }
 
     function renderTasks(tasks, elementId, showDelete) {
         const list = document.getElementById(elementId);
         
+        // 雙重保險：如果 tasks 真的不是陣列，就顯示暫無資料
         if (!Array.isArray(tasks)) {
-            console.error(`${elementId} 資料非陣列：`, tasks);
+            console.warn(`${elementId} 接收到的資料不是陣列:`, tasks);
             list.innerHTML = '<div class="no-task">暫無資料</div>';
             return;
         }
-
+    
         if (tasks.length === 0) {
             list.innerHTML = '<div class="no-task">目前沒有任務</div>';
             return;
         }
-
+    
         list.innerHTML = tasks.map(t => `
             <div class="task-item ${!showDelete ? 'history-item' : ''}">
                 <div class="task-info">
@@ -119,7 +128,6 @@
             </div>
         `).join('');
     }
-
     async function addTask() {
         const task = document.getElementById('taskInput').value;
         const timeInput = document.getElementById('timeInput').value;
