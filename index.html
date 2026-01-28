@@ -3,18 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>提姆筆記本管理 - 測試版</title>
+    <title>提姆筆記本管理</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         :root { --primary-color: #4a90e2; --bg-color: #f5f7fa; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); padding: 20px; margin: 0; }
         .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { color: var(--primary-color); text-align: center; }
-        #user-info { background: #eef5ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; }
-        #debug-log { background: #333; color: #0f0; font-family: monospace; font-size: 11px; padding: 10px; margin-top: 20px; border-radius: 5px; height: 150px; overflow-y: auto; white-space: pre-wrap; }
+        h2 { color: var(--primary-color); text-align: center; margin-bottom: 25px; }
+        h3 { border-left: 4px solid var(--primary-color); padding-left: 10px; margin-top: 30px; font-size: 1.1em; }
+        
+        #user-info { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; background: #eef5ff; padding: 10px; border-radius: 8px; }
+        #user-info img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; border: 2px solid white; }
+
         .form-group { margin-bottom: 15px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
-        button.add-btn { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
+        button.add-btn { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        .task-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
+        .task-info { flex-grow: 1; }
+        .task-name { font-weight: bold; color: #333; }
+        .task-time { font-size: 0.85em; color: #888; margin-top: 4px; }
+        .del-btn { background: #ff4d4f; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.8em; cursor: pointer; }
+        .no-task { color: #aaa; text-align: center; padding: 20px; font-size: 0.9em; font-style: italic; }
+        .history-item { opacity: 0.6; background: #fafafa; }
     </style>
 </head>
 <body>
@@ -24,64 +35,44 @@
     <h2>提姆筆記本管理</h2>
 
     <div class="form-group">
-        <input type="text" id="taskInput" placeholder="輸入任務內容">
+        <input type="text" id="taskInput" placeholder="想提醒什麼？">
         <input type="datetime-local" id="timeInput">
         <button class="add-btn" onclick="addTask()">存入提姆筆記本</button>
     </div>
 
-    <div id="task-status" style="text-align:center; color:#888;">等待連線中...</div>
-    
-    <div id="debug-log">【系統日誌】<br></div>
+    <h3>📌 待執行提醒</h3>
+    <div id="pending-list"><div class="no-task">讀取中...</div></div>
+
+    <h3>🕰️ 歷史紀錄 (最近10筆)</h3>
+    <div id="history-list"><div class="no-task">讀取中...</div></div>
 </div>
 
 <script>
-    const LIFF_ID = "2008963829-tIljVU3d";
-    const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api";
+    const LIFF_ID = "2008963829-tIljVU3d"; 
+    const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; 
     let userId = "";
 
-    function dLog(msg) {
-        const el = document.getElementById('debug-log');
-        if (el) el.innerHTML += `> ${msg}\n`;
-        console.log(msg);
-    }
-
     async function initApp() {
-        dLog("1. 嘗試啟動...");
         try {
-            if (typeof liff === 'undefined') {
-                dLog("❌ 錯誤：找不到 liff 物件。請確認網路能讀取 static.line-scdn.net");
-                return;
-            }
-
-            dLog("2. 執行 liff.init，ID: " + LIFF_ID);
             await liff.init({ liffId: LIFF_ID });
-            dLog("3. LIFF 初始化成功");
-
-            // PC 測試關鍵：檢查是否已登入
             if (!liff.isLoggedIn()) {
-                dLog("4. 偵測到未登入。");
-                // 在 PC 上，這行會引導至 LINE 登入頁面
-                dLog("正在跳轉至 LINE 登入頁面...");
-                liff.login(); 
+                liff.login();
             } else {
-                dLog("4. 已登入，正在獲取 Profile...");
                 const profile = await liff.getProfile();
                 userId = profile.userId;
-                dLog("5. 拿到 ID: " + userId);
-                document.getElementById('user-info').innerText = "哈囉，" + profile.displayName + "！";
+                document.getElementById('user-info').innerHTML = `
+                    <img src="${profile.pictureUrl}" alt="icon">
+                    <span>哈囉，${profile.displayName}！</span>
+                `;
                 fetchTasks();
             }
         } catch (err) {
-            dLog("❌ 初始化異常: " + err.code + " - " + err.message);
-            if (err.message.includes("URL")) {
-                dLog("👉 警告：請檢查 LINE Developers 的 Endpoint URL 是否與目前網址完全相符");
-            }
+            console.error("LIFF 初始化失敗", err);
         }
     }
 
     async function fetchTasks() {
         if (!userId) return;
-        dLog("6. 發送請求至 GCP...");
         try {
             const res = await fetch(API_URL, {
                 method: 'POST',
@@ -89,15 +80,70 @@
                 body: JSON.stringify({ action: "get_tasks", user_id: userId })
             });
             const data = await res.json();
-            dLog("7. 抓取成功！");
-            document.getElementById('task-status').innerText = "任務已更新 (詳見 Console)";
-        } catch (e) {
-            dLog("❌ 抓取失敗，請確認 GCP 的 CORS 設定。");
+            
+            // 強制確保為陣列，避免 forEach 錯誤
+            const pending = (data && Array.isArray(data.pending)) ? data.pending : [];
+            const history = (data && Array.isArray(data.history)) ? data.history : [];
+
+            renderTasks(pending, "pending-list", true);
+            renderTasks(history, "history-list", false);
+        } catch (err) {
+            console.error("抓取失敗", err);
         }
     }
 
-    // 啟動
-    initApp();
+    function renderTasks(tasks, elementId, showDelete) {
+        const list = document.getElementById(elementId);
+        if (tasks.length === 0) {
+            list.innerHTML = '<div class="no-task">目前沒有紀錄</div>';
+            return;
+        }
+
+        list.innerHTML = tasks.map(t => `
+            <div class="task-item ${!showDelete ? 'history-item' : ''}">
+                <div class="task-info">
+                    <div class="task-name">${t.task || '未命名'}</div>
+                    <div class="task-time">${t.remind_at || '時間未知'}</div>
+                </div>
+                ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
+            </div>
+        `).join('');
+    }
+
+    async function addTask() {
+        const task = document.getElementById('taskInput').value;
+        const timeInput = document.getElementById('timeInput').value;
+        if (!task || !timeInput) return alert("資訊不完整");
+
+        const formattedTime = timeInput.replace('T', ' ') + ':00';
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: formattedTime })
+            });
+            const result = await res.json();
+            if (result.status === "success") {
+                alert("已成功存入！");
+                document.getElementById('taskInput').value = "";
+                fetchTasks();
+            }
+        } catch (err) { alert("新增失敗"); }
+    }
+
+    async function deleteTask(id) {
+        if (!confirm("確定要刪除嗎？")) return;
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
+            });
+            fetchTasks();
+        } catch (err) { alert("刪除失敗"); }
+    }
+
+    window.onload = initApp;
 </script>
 </body>
 </html>
