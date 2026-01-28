@@ -16,24 +16,34 @@
         #user-info img { width: 44px; height: 44px; border-radius: 50%; margin-right: 12px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         .form-group { background: #fafafa; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        label { display: block; font-size: 0.9em; color: #666; margin-bottom: 5px; margin-left: 2px; }
-        input { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 12px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(74,144,226,0.1); }
+        label { display: block; font-size: 0.9em; color: #666; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 12px; outline: none; }
         button.add-btn { width: 100%; padding: 14px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(74,144,226,0.3); }
-        button.add-btn:active { transform: scale(0.98); }
-        
+
+        /* 自訂彈窗樣式 */
+        #custom-alert {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85); color: white; padding: 25px 40px;
+            border-radius: 15px; text-align: center; z-index: 1000; min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        #custom-alert .msg { font-size: 24px; font-weight: 900; margin-bottom: 5px; letter-spacing: 1px; }
+        #custom-alert .sub { font-size: 14px; opacity: 0.8; }
+
         .task-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #f0f0f0; }
         .task-info { flex-grow: 1; }
-        .task-name { font-weight: 600; color: #2c3e50; font-size: 1.05em; }
-        .task-time { font-size: 0.85em; color: #95a5a6; margin-top: 4px; display: flex; align-items: center; }
-        .task-time::before { content: '⏰'; margin-right: 4px; font-size: 1em; }
-        .del-btn { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; padding: 6px 14px; border-radius: 6px; font-size: 0.85em; cursor: pointer; font-weight: 500; transition: 0.2s; }
-        .del-btn:hover { background: #ff4d4f; color: white; }
-        .no-task { color: #bdc3c7; text-align: center; padding: 30px; font-size: 0.95em; }
-        .history-item { opacity: 0.7; background: #fbfbfb; }
+        .task-name { font-weight: 600; color: #2c3e50; }
+        .task-time { font-size: 0.85em; color: #95a5a6; margin-top: 4px; }
+        .del-btn { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; padding: 6px 14px; border-radius: 6px; font-size: 0.85em; cursor: pointer; }
+        .no-task { color: #bdc3c7; text-align: center; padding: 30px; }
     </style>
 </head>
 <body>
+
+<div id="custom-alert">
+    <div class="msg" id="alert-text">存入成功！</div>
+    <div class="sub">提姆筆記本已更新</div>
+</div>
 
 <div class="container">
     <div id="user-info">載入中...</div>
@@ -41,7 +51,7 @@
 
     <div class="form-group">
         <label>提醒內容</label>
-        <input type="text" id="taskInput" placeholder="想提醒什麼？ (例如：喝咖啡)">
+        <input type="text" id="taskInput" placeholder="想提醒什麼？">
         <label>提醒時間</label>
         <input type="datetime-local" id="timeInput">
         <button class="add-btn" onclick="addTask()">＋ 存入筆記本</button>
@@ -58,6 +68,15 @@
     const LIFF_ID = "2008963829-tIljVU3d"; 
     const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; 
     let userId = "";
+
+    // 顯示自訂彈窗的函式
+    function showAlert(message) {
+        const modal = document.getElementById('custom-alert');
+        document.getElementById('alert-text').innerText = message;
+        modal.style.display = 'block';
+        // 2秒後自動消失
+        setTimeout(() => { modal.style.display = 'none'; }, 2000);
+    }
 
     async function initApp() {
         try {
@@ -87,14 +106,9 @@
                 body: JSON.stringify({ action: "get_tasks", user_id: userId })
             });
             const data = await res.json();
-            const pending = (data && Array.isArray(data.pending)) ? data.pending : [];
-            const history = (data && Array.isArray(data.history)) ? data.history : [];
-
-            renderTasks(pending, "pending-list", true);
-            renderTasks(history, "history-list", false);
-        } catch (err) {
-            console.error("Fetch failed", err);
-        }
+            renderTasks(data.pending || [], "pending-list", true);
+            renderTasks(data.history || [], "history-list", false);
+        } catch (err) { console.error(err); }
     }
 
     function renderTasks(tasks, elementId, showDelete) {
@@ -103,12 +117,11 @@
             list.innerHTML = '<div class="no-task">目前沒有紀錄</div>';
             return;
         }
-
         list.innerHTML = tasks.map(t => `
-            <div class="task-item ${!showDelete ? 'history-item' : ''}">
+            <div class="task-item">
                 <div class="task-info">
                     <div class="task-name">${t.task || '未命名'}</div>
-                    <div class="task-time">${t.remind_at || '時間未知'}</div>
+                    <div class="task-time">⏰ ${t.remind_at || '時間未知'}</div>
                 </div>
                 ${showDelete ? `<button class="del-btn" onclick="deleteTask('${t.id}')">刪除</button>` : ''}
             </div>
@@ -118,7 +131,10 @@
     async function addTask() {
         const task = document.getElementById('taskInput').value;
         const timeInput = document.getElementById('timeInput').value;
-        if (!task || !timeInput) return alert("請填寫內容與時間");
+        if (!task || !timeInput) {
+            showAlert("請填寫完整內容"); // 使用自訂彈窗
+            return;
+        }
 
         const formattedTime = timeInput.replace('T', ' ') + ':00';
         try {
@@ -129,15 +145,15 @@
             });
             const result = await res.json();
             if (result.status === "success") {
-                alert("提姆記下來了！");
+                showAlert("✅ 存入成功！"); // 這裡改用大字體彈窗
                 document.getElementById('taskInput').value = "";
                 fetchTasks();
             }
-        } catch (err) { alert("儲存失敗"); }
+        } catch (err) { showAlert("❌ 儲存失敗"); }
     }
 
     async function deleteTask(id) {
-        if (!confirm("確定要刪除這項提醒嗎？")) return;
+        if (!confirm("確定要刪除嗎？")) return;
         try {
             await fetch(API_URL, {
                 method: 'POST',
@@ -145,7 +161,8 @@
                 body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
             });
             fetchTasks();
-        } catch (err) { alert("刪除失敗"); }
+            showAlert("🗑️ 已刪除"); // 刪除成功也顯示大字體
+        } catch (err) { showAlert("刪除失敗"); }
     }
 
     window.onload = initApp;
