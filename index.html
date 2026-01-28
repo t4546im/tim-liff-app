@@ -12,7 +12,7 @@
         h2 { color: var(--primary-color); text-align: center; margin-bottom: 25px; font-weight: 800; }
         h3 { border-left: 4px solid var(--primary-color); padding-left: 12px; margin-top: 30px; font-size: 1.1em; color: #333; }
         
-        #user-info { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; background: #f0f7ff; padding: 12px; border-radius: 10px; color: #2c3e50; }
+        #user-info { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; background: #f0f7ff; padding: 10px; border-radius: 10px; color: #2c3e50; }
         #user-info img { width: 44px; height: 44px; border-radius: 50%; margin-right: 12px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         .form-group { background: #fafafa; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
@@ -20,15 +20,14 @@
         input { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 12px; outline: none; }
         button.add-btn { width: 100%; padding: 14px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(74,144,226,0.3); }
 
-        /* 自訂彈窗樣式 */
+        /* 自訂彈窗樣式 - 移除副標題後的微調 */
         #custom-alert {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.85); color: white; padding: 25px 40px;
-            border-radius: 15px; text-align: center; z-index: 1000; min-width: 200px;
+            background: rgba(0, 0, 0, 0.85); color: white; padding: 30px 50px;
+            border-radius: 15px; text-align: center; z-index: 1000; min-width: 220px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-        #custom-alert .msg { font-size: 24px; font-weight: 900; margin-bottom: 5px; letter-spacing: 1px; }
-        #custom-alert .sub { font-size: 14px; opacity: 0.8; }
+        #custom-alert .msg { font-size: 26px; font-weight: 900; letter-spacing: 1px; }
 
         .task-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #f0f0f0; }
         .task-info { flex-grow: 1; }
@@ -42,7 +41,6 @@
 
 <div id="custom-alert">
     <div class="msg" id="alert-text">存入成功！</div>
-    #<div class="sub">提姆筆記本已更新</div>
 </div>
 
 <div class="container">
@@ -69,12 +67,10 @@
     const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; 
     let userId = "";
 
-    // 顯示自訂彈窗的函式
     function showAlert(message) {
         const modal = document.getElementById('custom-alert');
         document.getElementById('alert-text').innerText = message;
         modal.style.display = 'block';
-        // 2秒後自動消失
         setTimeout(() => { modal.style.display = 'none'; }, 2000);
     }
 
@@ -127,45 +123,3 @@
             </div>
         `).join('');
     }
-
-    async function addTask() {
-        const task = document.getElementById('taskInput').value;
-        const timeInput = document.getElementById('timeInput').value;
-        if (!task || !timeInput) {
-            showAlert("請填寫完整內容"); // 使用自訂彈窗
-            return;
-        }
-
-        const formattedTime = timeInput.replace('T', ' ') + ':00';
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: formattedTime })
-            });
-            const result = await res.json();
-            if (result.status === "success") {
-                showAlert("✅ 存入成功！"); // 這裡改用大字體彈窗
-                document.getElementById('taskInput').value = "";
-                fetchTasks();
-            }
-        } catch (err) { showAlert("❌ 儲存失敗"); }
-    }
-
-    async function deleteTask(id) {
-        if (!confirm("確定要刪除嗎？")) return;
-        try {
-            await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
-            });
-            fetchTasks();
-            showAlert("🗑️ 已刪除"); // 刪除成功也顯示大字體
-        } catch (err) { showAlert("刪除失敗"); }
-    }
-
-    window.onload = initApp;
-</script>
-</body>
-</html>
