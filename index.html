@@ -123,3 +123,45 @@
             </div>
         `).join('');
     }
+
+    async function addTask() {
+        const task = document.getElementById('taskInput').value;
+        const timeInput = document.getElementById('timeInput').value;
+        if (!task || !timeInput) {
+            showAlert("⚠️ 請填寫內容");
+            return;
+        }
+
+        const formattedTime = timeInput.replace('T', ' ') + ':00';
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "add_task", user_id: userId, task: task, remind_at: formattedTime })
+            });
+            const result = await res.json();
+            if (result.status === "success") {
+                showAlert("✅ 存入成功！");
+                document.getElementById('taskInput').value = "";
+                fetchTasks();
+            }
+        } catch (err) { showAlert("❌ 儲存失敗"); }
+    }
+
+    async function deleteTask(id) {
+        if (!confirm("確定要刪除嗎？")) return;
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "delete_task", task_id: id, user_id: userId })
+            });
+            fetchTasks();
+            showAlert("🗑️ 已刪除");
+        } catch (err) { showAlert("刪除失敗"); }
+    }
+
+    window.onload = initApp;
+</script>
+</body>
+</html>
