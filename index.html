@@ -8,43 +8,50 @@
     <style>
         :root { --primary-color: #4a90e2; --bg-color: #f5f7fa; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); padding: 20px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { color: var(--primary-color); text-align: center; margin-bottom: 25px; }
-        h3 { border-left: 4px solid var(--primary-color); padding-left: 10px; margin-top: 30px; font-size: 1.1em; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { color: var(--primary-color); text-align: center; margin-bottom: 25px; font-weight: 800; }
+        h3 { border-left: 4px solid var(--primary-color); padding-left: 12px; margin-top: 30px; font-size: 1.1em; color: #333; }
         
-        #user-info { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; background: #eef5ff; padding: 10px; border-radius: 8px; }
-        #user-info img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; border: 2px solid white; }
+        #user-info { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; background: #f0f7ff; padding: 12px; border-radius: 10px; color: #2c3e50; }
+        #user-info img { width: 44px; height: 44px; border-radius: 50%; margin-right: 12px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-        .form-group { margin-bottom: 15px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
-        button.add-btn { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .form-group { background: #fafafa; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        label { display: block; font-size: 0.9em; color: #666; margin-bottom: 5px; margin-left: 2px; }
+        input { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 12px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(74,144,226,0.1); }
+        button.add-btn { width: 100%; padding: 14px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(74,144,226,0.3); }
+        button.add-btn:active { transform: scale(0.98); }
         
-        .task-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
+        .task-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #f0f0f0; }
         .task-info { flex-grow: 1; }
-        .task-name { font-weight: bold; color: #333; }
-        .task-time { font-size: 0.85em; color: #888; margin-top: 4px; }
-        .del-btn { background: #ff4d4f; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.8em; cursor: pointer; }
-        .no-task { color: #aaa; text-align: center; padding: 20px; font-size: 0.9em; font-style: italic; }
-        .history-item { opacity: 0.6; background: #fafafa; }
+        .task-name { font-weight: 600; color: #2c3e50; font-size: 1.05em; }
+        .task-time { font-size: 0.85em; color: #95a5a6; margin-top: 4px; display: flex; align-items: center; }
+        .task-time::before { content: '⏰'; margin-right: 4px; font-size: 1em; }
+        .del-btn { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; padding: 6px 14px; border-radius: 6px; font-size: 0.85em; cursor: pointer; font-weight: 500; transition: 0.2s; }
+        .del-btn:hover { background: #ff4d4f; color: white; }
+        .no-task { color: #bdc3c7; text-align: center; padding: 30px; font-size: 0.95em; }
+        .history-item { opacity: 0.7; background: #fbfbfb; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="user-info">🚀 正在偵測系統環境...</div>
-    <h2>提姆筆記本管理</h2>
+    <div id="user-info">載入中...</div>
+    <h2>提姆筆記本</h2>
 
     <div class="form-group">
-        <input type="text" id="taskInput" placeholder="想提醒什麼？">
+        <label>提醒內容</label>
+        <input type="text" id="taskInput" placeholder="想提醒什麼？ (例如：喝咖啡)">
+        <label>提醒時間</label>
         <input type="datetime-local" id="timeInput">
-        <button class="add-btn" onclick="addTask()">存入提姆筆記本</button>
+        <button class="add-btn" onclick="addTask()">＋ 存入筆記本</button>
     </div>
 
     <h3>📌 待執行提醒</h3>
-    <div id="pending-list"><div class="no-task">讀取中...</div></div>
+    <div id="pending-list"><div class="no-task">讀取資料中...</div></div>
 
-    <h3>🕰️ 歷史紀錄 (最近10筆)</h3>
-    <div id="history-list"><div class="no-task">讀取中...</div></div>
+    <h3>🕰️ 最近紀錄</h3>
+    <div id="history-list"><div class="no-task">讀取資料中...</div></div>
 </div>
 
 <script>
@@ -67,7 +74,7 @@
                 fetchTasks();
             }
         } catch (err) {
-            console.error("LIFF 初始化失敗", err);
+            document.getElementById('user-info').innerText = "連線失敗";
         }
     }
 
@@ -80,15 +87,13 @@
                 body: JSON.stringify({ action: "get_tasks", user_id: userId })
             });
             const data = await res.json();
-            
-            // 強制確保為陣列，避免 forEach 錯誤
             const pending = (data && Array.isArray(data.pending)) ? data.pending : [];
             const history = (data && Array.isArray(data.history)) ? data.history : [];
 
             renderTasks(pending, "pending-list", true);
             renderTasks(history, "history-list", false);
         } catch (err) {
-            console.error("抓取失敗", err);
+            console.error("Fetch failed", err);
         }
     }
 
@@ -113,7 +118,7 @@
     async function addTask() {
         const task = document.getElementById('taskInput').value;
         const timeInput = document.getElementById('timeInput').value;
-        if (!task || !timeInput) return alert("資訊不完整");
+        if (!task || !timeInput) return alert("請填寫內容與時間");
 
         const formattedTime = timeInput.replace('T', ' ') + ':00';
         try {
@@ -124,15 +129,15 @@
             });
             const result = await res.json();
             if (result.status === "success") {
-                alert("已成功存入！");
+                alert("提姆記下來了！");
                 document.getElementById('taskInput').value = "";
                 fetchTasks();
             }
-        } catch (err) { alert("新增失敗"); }
+        } catch (err) { alert("儲存失敗"); }
     }
 
     async function deleteTask(id) {
-        if (!confirm("確定要刪除嗎？")) return;
+        if (!confirm("確定要刪除這項提醒嗎？")) return;
         try {
             await fetch(API_URL, {
                 method: 'POST',
