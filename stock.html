@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📈 提姆股票觀察清單管理</title>
+    <!-- LINE LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --stock-up: #ef4444;
+            --stock-down: #22c55e;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            padding: 16px 12px 60px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* 頂部使用者卡片 */
+        .user-card {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            padding: 14px 16px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-md);
+        }
+        .user-card img {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            margin-right: 12px;
+            object-fit: cover;
+        }
+        .user-card .user-details {
+            flex-grow: 1;
+        }
+        .user-card .user-name {
+            font-weight: 700;
+            font-size: 1.05em;
+        }
+        .user-card .user-sub {
+            font-size: 0.8em;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .stats-badge {
+            background: rgba(37, 99, 235, 0.25);
+            border: 1px solid rgba(147, 197, 253, 0.3);
+            color: #93c5fd;
+            font-size: 0.8em;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* 標題與切換導覽 */
+        .header-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+        .header-title h2 {
+            font-size: 1.35em;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 新增股票區塊 */
+        .form-card {
+            background: var(--card-bg);
+            padding: 18px 16px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
+            border: 1px solid #f1f5f9;
+        }
+        .form-card-title {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .input-col {
+            flex: 1;
+        }
+        .input-col-code {
+            flex: 1.1;
+        }
+        .input-col-name {
+            flex: 1.4;
+        }
+        label {
+            display: block;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            background: #f8fafc;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s;
+        }
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* 熱門快捷標籤 */
+        .quick-chips-wrap {
+            margin-bottom: 12px;
+        }
+        .quick-chips-title {
+            font-size: 0.75em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .quick-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .chip {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.78em;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            transition: all 0.15s;
+        }
+        .chip:hover, .chip:active {
+            background: var(--primary-light);
+            color: var(--primary-color);
+            border-color: #bfdbfe;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-add:active {
+            transform: scale(0.98);
+        }
+
+        /* 搜尋與清單區塊 */
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 4px 10px;
+        }
+        .list-title {
+            font-size: 1.05em;
+            font-weight: 800;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .search-box {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .search-box input {
+            padding-left: 36px;
+            border-radius: 12px;
+            background: #ffffff;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* 股票卡片 */
+        .stock-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .stock-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+        }
+        .stock-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stock-identity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stock-code-badge {
+            background: #1e293b;
+            color: #ffffff;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.85em;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+        .stock-name {
+            font-weight: 800;
+            font-size: 1.05em;
+            color: #0f172a;
+        }
+        .stock-note-box {
+            background: #f8fafc;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.82em;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border-left: 3px solid #cbd5e1;
+        }
+        .stock-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 7px 10px;
+            font-size: 0.8em;
+            font-weight: 700;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+        .btn-diagnose {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+        .btn-diagnose:active {
+            background: #dbeafe;
+        }
+        .btn-edit {
+            background: #f8fafc;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            max-width: 60px;
+        }
+        .btn-delete {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            max-width: 60px;
+        }
+        .btn-delete:active {
+            background: #fee2e2;
+        }
+
+        /* 載入與空狀態 */
+        .loading-wrap, .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--border-color);
+            color: var(--text-muted);
+        }
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 自訂 Toast 提示窗 */
+        #custom-toast {
+            display: none;
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 23, 42, 0.92);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            max-width: 80%;
+        }
+
+        /* 編輯 Modal 彈窗 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            backdrop-filter: blur(2px);
+        }
+        .modal-box {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: popIn 0.2s ease-out;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .modal-header h3 {
+            font-size: 1.1em;
+            color: #0f172a;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 11px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+        .modal-btn-cancel {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .modal-btn-save {
+            background: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div id="custom-toast">提示訊息</div>
+
+<div class="container">
+    <!-- 使用者資訊卡片 -->
+    <div class="user-card" id="user-card">
+        <img id="user-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='46' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="Avatar">
+        <div class="user-details">
+            <div class="user-name" id="user-name">連線中...</div>
+            <div class="user-sub" id="user-sub">Firestore 自選股雲端同步</div>
+        </div>
+        <div class="stats-badge" id="stats-badge">0 檔追蹤</div>
+    </div>
+
+    <!-- 標題 -->
+    <div class="header-title">
+        <h2>📊 股票觀察名單</h2>
+    </div>
+
+    <!-- 新增股票表單 -->
+    <div class="form-card">
+        <div class="form-card-title">
+            <span>➕ 新增觀察標的</span>
+        </div>
+
+        <!-- 熱門標的快捷點選 -->
+        <div class="quick-chips-wrap">
+            <div class="quick-chips-title">🔥 快速填入熱門股：</div>
+            <div class="quick-chips">
+                <span class="chip" onclick="fillQuickStock('2330', '台積電', '晶圓代工龍頭')">2330 台積電</span>
+                <span class="chip" onclick="fillQuickStock('2454', '聯發科', 'IC設計旗艦')">2454 聯發科</span>
+                <span class="chip" onclick="fillQuickStock('2317', '鴻海', 'AI伺服器組裝')">2317 鴻海</span>
+                <span class="chip" onclick="fillQuickStock('00878', '國泰永續高股息', '季配高股息')">00878 高股息</span>
+                <span class="chip" onclick="fillQuickStock('0050', '元大台灣50', '大盤市值ETF')">0050 台灣50</span>
+                <span class="chip" onclick="fillQuickStock('00919', '群益精選高息', '高配息ETF')">00919 群益高息</span>
+                <span class="chip" onclick="fillQuickStock('2603', '長榮', '航運龍頭')">2603 長榮</span>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-col input-col-code">
+                <label for="stockCode">股票代號 *</label>
+                <input type="text" id="stockCode" placeholder="如 2330" maxlength="8" oninput="autoLookupName(this.value)">
+            </div>
+            <div class="input-col input-col-name">
+                <label for="stockName">股票名稱 (選填)</label>
+                <input type="text" id="stockName" placeholder="如 台積電">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+            <label for="stockNote">投資筆記 / 策略備註 (選填)</label>
+            <input type="text" id="stockNote" placeholder="例如：定期定額、跌破均線停損、AI概念">
+        </div>
+
+        <button class="btn-add" id="btnAdd" onclick="handleAddStock()">
+            <span>＋ 加入觀察清單</span>
+        </button>
+    </div>
+
+    <!-- 搜尋與名單列 -->
+    <div class="list-header">
+        <div class="list-title">
+            <span>📋 我的自選清單</span>
+        </div>
+    </div>
+
+    <!-- 搜尋框 -->
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchFilter" placeholder="搜尋已加入的代號或名稱..." oninput="handleSearch(this.value)">
+    </div>
+
+    <!-- 清單容器 -->
+    <div id="stock-list-container">
+        <div class="loading-wrap">
+            <div class="spinner"></div>
+            <div>正在載入您的自選股清單...</div>
+        </div>
+    </div>
+</div>
+
+<!-- 編輯 Modal 彈窗 -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modalStockTitle">✏️ 編輯股票資訊</h3>
+            <button class="modal-close" onclick="closeEditModal()">✕</button>
+        </div>
+        <input type="hidden" id="editStockCode">
+        <div style="margin-bottom: 12px;">
+            <label>股票名稱</label>
+            <input type="text" id="editStockName" placeholder="股票中文名稱">
+        </div>
+        <div style="margin-bottom: 14px;">
+            <label>投資筆記 / 備註</label>
+            <input type="text" id="editStockNote" placeholder="自訂備註說明">
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeEditModal()">取消</button>
+            <button class="modal-btn modal-btn-save" onclick="handleSaveEdit()">儲存更新</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // ⚙️ LIFF 與 API 基礎設定
+    // ==========================================
+    const LIFF_ID = "2008963829-tIljVU3d"; 
+    const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; 
+
+    let currentUserId = "";
+    let rawWatchlist = [];
+
+    // 熱門常用對照表（供前端即時自動填寫）
+    const POPULAR_STOCKS = {
+        "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2308": "台達電", "2382": "廣達",
+        "0050": "元大台灣50", "0056": "元大高股息", "00878": "國泰永續高股息", "00919": "群益台灣精選高息",
+        "00929": "復華台灣科技優息", "006208": "富邦台50", "00713": "元大台灣高息低波", "00940": "元大台灣價值高息",
+        "2603": "長榮", "2609": "陽明", "2615": "萬海", "2618": "長榮航", "2881": "富邦金", "2882": "國泰金"
+    };
+
+    // ==========================================
+    // 💬 提示訊息與 Toast
+    // ==========================================
+    function showToast(msg, duration = 2200) {
+        const toast = document.getElementById('custom-toast');
+        toast.innerText = msg;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, duration);
+    }
+
+    // ==========================================
+    // 🚀 初始化 App (LIFF)
+    // ==========================================
+    async function initApp() {
+        try {
+            await liff.init({ liffId: LIFF_ID });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
+                const profile = await liff.getProfile();
+                currentUserId = profile.userId;
+
+                document.getElementById('user-name').innerText = `哈囉，${profile.displayName}！`;
+                if (profile.pictureUrl) {
+                    document.getElementById('user-avatar').src = profile.pictureUrl;
+                }
+                loadWatchlist();
+            }
+        } catch (err) {
+            console.error("LIFF Init Error:", err);
+            // 本機開發測試環境備用 UID
+            const urlParams = new URLSearchParams(window.location.search);
+            currentUserId = urlParams.get('user_id') || "test_user_id";
+            document.getElementById('user-name').innerText = "測試模式 (本地)";
+            loadWatchlist();
+        }
+    }
+
+    // ==========================================
+    // 📥 讀取 Firestore 股票清單
+    // ==========================================
+    async function loadWatchlist() {
+        if (!currentUserId) return;
+        const container = document.getElementById('stock-list-container');
+        
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: "get_stock",
+                    user_id: currentUserId
+                })
+            });
+            const data = await res.json();
+            rawWatchlist = data.list || [];
+            updateStatsBadge(rawWatchlist.length);
+            renderStockList(rawWatchlist);
+        } catch (err) {
+            console.error("Fetch Watchlist Error:", err);
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size: 28px; margin-bottom: 8px;">⚠️</div>
+                    <div>連線發生異常，無法取得自選股資料</div>
+                    <button class="btn-add" style="margin-top: 12px; padding: 8px 16px; width: auto;" onclick="loadWatchlist()">重試</button>
+                </div>
+            `;
+        }
+    }
+
+    // ==========================================
+    // 🎨 渲染股票列表卡片
+    // ==========================================
+    function renderStockList(stocks) {
+        const container = document.getElementById('stock-list-container');
+        if (!stocks || stocks.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size: 34px; margin-bottom: 8px;">📈</div>
+                    <div style="font-weight: 700; color: #334155; margin-bottom: 4px;">目前觀察清單尚無股票</div>
+                    <div style="font-size: 0.85em;">您可以透過上方表單或熱門標籤新增您的自選股！</div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = stocks.map(item => {
+            const safeCode = escapeHtml(item.code || '');
+            const safeName = escapeHtml(item.name || safeCode);
+            const safeNote = escapeHtml(item.note || '');
+
+            return `
+                <div class="stock-card" id="stock-card-${safeCode}">
+                    <div class="stock-card-top">
+                        <div class="stock-identity">
+                            <span class="stock-code-badge">${safeCode}</span>
+                            <span class="stock-name">${safeName}</span>
+                        </div>
+                    </div>
+                    ${safeNote ? `
+                        <div class="stock-note-box">
+                            <span>📝</span>
+                            <span>${safeNote}</span>
+                        </div>
+                    ` : ''}
+                    <div class="stock-actions">
+                        <button class="btn-action btn-diagnose" onclick="triggerStockDiagnosis('${safeCode}')">
+                            <span>📊 智能診斷</span>
+                        </button>
+                        <button class="btn-action btn-edit" onclick="openEditModal('${safeCode}', '${safeName}', '${safeNote}')">
+                            <span>✏️ 編輯</span>
+                        </button>
+                        <button class="btn-action btn-delete" onclick="handleDeleteStock('${safeCode}', '${safeName}')">
+                            <span>🗑️ 刪除</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ==========================================
+    // ➕ 新增股票
+    // ==========================================
+    async function handleAddStock() {
+        const codeInput = document.getElementById('stockCode');
+        const nameInput = document.getElementById('stockName');
+        const noteInput = document.getElementById('stockNote');
+        const btnAdd = document.getElementById('btnAdd');
+
+        const code = codeInput.value.trim().toUpperCase();
+        const name = nameInput.value.trim();
+        const note = noteInput.value.trim();
+
+        if (!code) {
+            showToast("⚠️ 請輸入股票代號 (如 2330)");
+            codeInput.focus();
+            return;
+        }
+
+        btnAdd.disabled = true;
+        btnAdd.innerText = "正在儲存...";
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: "add_stock",
+                    user_id: currentUserId,
+                    code: code,
+                    name: name || POPULAR_STOCKS[code] || "",
+                    note: note
+                })
+            });
+            const result = await res.json();
+            if (result.status) {
+                showToast(`✅ 已將 ${code} 加入觀察清單！`);
+                codeInput.value = "";
+                nameInput.value = "";
+                noteInput.value = "";
+                loadWatchlist();
+            } else {
+                showToast("❌ 新增失敗，請稍後再試");
+            }
+        } catch (err) {
+            console.error(err);
+            showToast("❌ 網路請求失敗");
+        } finally {
+            btnAdd.disabled = false;
+            btnAdd.innerText = "＋ 加入觀察清單";
+        }
+    }
+
+    // ==========================================
+    // 🗑️ 刪除股票
+    // ==========================================
+    async function handleDeleteStock(code, name) {
+        if (!confirm(`確定要將【${code} ${name}】從觀察清單中移除嗎？`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: "delete_stock",
+                    user_id: currentUserId,
+                    code: code
+                })
+            });
+            const result = await res.json();
+            showToast(`🗑️ 已移除 ${code}`);
+            loadWatchlist();
+        } catch (err) {
+            console.error(err);
+            showToast("❌ 刪除失敗");
+        }
+    }
+
+    // ==========================================
+    // ✏️ 編輯股票 Modal 操作
+    // ==========================================
+    function openEditModal(code, name, note) {
+        document.getElementById('editStockCode').value = code;
+        document.getElementById('editStockName').value = name;
+        document.getElementById('editStockNote').value = note;
+        document.getElementById('modalStockTitle').innerText = `✏️ 編輯 ${code} ${name}`;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function handleSaveEdit() {
+        const code = document.getElementById('editStockCode').value;
+        const name = document.getElementById('editStockName').value.trim();
+        const note = document.getElementById('editStockNote').value.trim();
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: "update_stock",
+                    user_id: currentUserId,
+                    code: code,
+                    name: name,
+                    note: note
+                })
+            });
+            showToast(`✅ ${code} 更新成功！`);
+            closeEditModal();
+            loadWatchlist();
+        } catch (err) {
+            console.error(err);
+            showToast("❌ 更新失敗");
+        }
+    }
+
+    // ==========================================
+    // 💬 發送即時個股診斷至 LINE
+    // ==========================================
+    async function triggerStockDiagnosis(code) {
+        const msgText = `查 ${code}`;
+        if (liff.isInClient()) {
+            try {
+                await liff.sendMessages([{
+                    type: 'text',
+                    text: msgText
+                }]);
+                showToast(`🚀 已發送【${code}】診斷請求！`);
+                setTimeout(() => { liff.closeWindow(); }, 1200);
+            } catch (err) {
+                console.warn("sendMessages not allowed or cancelled:", err);
+                showToast(`💡 請在聊天室輸入「${msgText}」即可診斷`);
+            }
+        } else {
+            showToast(`💡 聊天室輸入「${msgText}」即可檢視診斷報告`);
+        }
+    }
+
+    // ==========================================
+    // 🔍 即時搜尋篩選
+    // ==========================================
+    function handleSearch(keyword) {
+        const term = keyword.trim().toLowerCase();
+        if (!term) {
+            renderStockList(rawWatchlist);
+            return;
+        }
+        const filtered = rawWatchlist.filter(item => {
+            const code = (item.code || '').toLowerCase();
+            const name = (item.name || '').toLowerCase();
+            const note = (item.note || '').toLowerCase();
+            return code.includes(term) || name.includes(term) || note.includes(term);
+        });
+        renderStockList(filtered);
+    }
+
+    // ==========================================
+    // ⚡ 輔助函數
+    // ==========================================
+    function fillQuickStock(code, name, note) {
+        document.getElementById('stockCode').value = code;
+        document.getElementById('stockName').value = name;
+        document.getElementById('stockNote').value = note;
+    }
+
+    function autoLookupName(code) {
+        const clean = code.trim();
+        const nameInput = document.getElementById('stockName');
+        if (POPULAR_STOCKS[clean] && !nameInput.value) {
+            nameInput.value = POPULAR_STOCKS[clean];
+        }
+    }
+
+    function updateStatsBadge(count) {
+        document.getElementById('stats-badge').innerText = `已追蹤 ${count} 檔`;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag));
+    }
+
+    window.onload = initApp;
+</script>
+</body>
+</html>
