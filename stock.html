@@ -296,7 +296,7 @@
             gap: 5px;
             border-left: 3px solid #cbd5e1;
         }
-        .stock-actions {
+ /*       .stock-actions {
             display: flex;
             gap: 6px;
             margin-top: 4px;
@@ -314,6 +314,21 @@
             justify-content: center;
             gap: 4px;
             transition: all 0.15s;
+        }    */
+        /* 容器：設為 Flex 佈局並禁止換行 */
+        .stock-actions {
+            display: flex;
+            flex-wrap: nowrap; /* 強制不換行 */
+            gap: 8px;          /* 按鈕之間的間距 */
+            width: 100%;       /* 佔滿父容器寬度 */
+        }
+        
+        /* 按鈕：設為平分寬度 */
+        .stock-actions .btn-action {
+            flex: 1;           /* 三個按鈕平分剩餘空間 (等於 width: 33.33%) */
+            min-width: 0;      /* 防止內容擠壓導致溢出 */
+            white-space: nowrap;/* 防止按鈕文字換行 */
+            text-align: center;
         }
         .btn-diagnose {
             background: #eff6ff;
