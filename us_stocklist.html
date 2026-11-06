@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -18,8 +19,8 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
             --radius-md: 12px;
             --radius-lg: 16px;
         }
@@ -55,26 +56,31 @@
             margin-bottom: 16px;
             box-shadow: var(--shadow-md);
         }
+
         .user-card img {
             width: 46px;
             height: 46px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             margin-right: 12px;
             object-fit: cover;
         }
+
         .user-card .user-details {
             flex-grow: 1;
         }
+
         .user-card .user-name {
             font-weight: 700;
             font-size: 1.05em;
         }
+
         .user-card .user-sub {
             font-size: 0.8em;
             color: #93c5fd;
             margin-top: 2px;
         }
+
         .stats-badge {
             background: rgba(59, 130, 246, 0.25);
             border: 1px solid rgba(147, 197, 253, 0.3);
@@ -93,6 +99,7 @@
             margin-bottom: 16px;
             padding: 0 4px;
         }
+
         .header-title h2 {
             font-size: 1.35em;
             font-weight: 800;
@@ -111,6 +118,7 @@
             margin-bottom: 20px;
             border: 1px solid #f1f5f9;
         }
+
         .form-card-title {
             font-size: 0.95em;
             font-weight: 700;
@@ -120,20 +128,25 @@
             align-items: center;
             gap: 6px;
         }
+
         .input-row {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
         }
+
         .input-col {
             flex: 1;
         }
+
         .input-col-code {
             flex: 1.1;
         }
+
         .input-col-name {
             flex: 1.4;
         }
+
         label {
             display: block;
             font-size: 0.8em;
@@ -141,7 +154,10 @@
             color: var(--text-muted);
             margin-bottom: 4px;
         }
-        input, select, textarea {
+
+        input,
+        select,
+        textarea {
             width: 100%;
             padding: 11px 12px;
             border: 1.5px solid var(--border-color);
@@ -152,7 +168,9 @@
             outline: none;
             transition: all 0.2s;
         }
-        input:focus, textarea:focus {
+
+        input:focus,
+        textarea:focus {
             border-color: var(--primary-color);
             background: #ffffff;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
@@ -162,16 +180,19 @@
         .quick-chips-wrap {
             margin-bottom: 12px;
         }
+
         .quick-chips-title {
             font-size: 0.75em;
             color: var(--text-muted);
             margin-bottom: 6px;
         }
+
         .quick-chips {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
         }
+
         .chip {
             background: #f1f5f9;
             color: #334155;
@@ -183,7 +204,9 @@
             border: 1px solid #e2e8f0;
             transition: all 0.15s;
         }
-        .chip:hover, .chip:active {
+
+        .chip:hover,
+        .chip:active {
             background: #e2e8f0;
             border-color: #cbd5e1;
             transform: scale(0.98);
@@ -206,6 +229,7 @@
             gap: 6px;
             transition: all 0.2s;
         }
+
         .btn-add:active {
             background: var(--primary-hover);
             transform: scale(0.98);
@@ -218,6 +242,7 @@
             align-items: center;
             margin: 20px 4px 10px;
         }
+
         .list-title {
             font-size: 1em;
             font-weight: 700;
@@ -232,10 +257,12 @@
             position: relative;
             margin-bottom: 14px;
         }
+
         .search-box input {
             padding-left: 36px;
             background: white;
         }
+
         .search-icon {
             position: absolute;
             left: 12px;
@@ -258,19 +285,23 @@
             gap: 8px;
             transition: transform 0.15s, box-shadow 0.15s;
         }
+
         .stock-card:hover {
             box-shadow: var(--shadow-md);
         }
+
         .stock-card-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .stock-identity {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .stock-code-badge {
             background: #0f172a;
             color: #ffffff;
@@ -280,6 +311,7 @@
             border-radius: 6px;
             letter-spacing: 0.5px;
         }
+
         .stock-name {
             font-weight: 700;
             font-size: 1.05em;
@@ -306,6 +338,7 @@
             padding-top: 8px;
             border-top: 1px dashed #f1f5f9;
         }
+
         .btn-action {
             flex: 1;
             padding: 7px 0;
@@ -320,27 +353,33 @@
             gap: 4px;
             transition: all 0.15s;
         }
+
         .btn-diagnose {
             background: #eff6ff;
             color: #1d4ed8;
             border-color: #bfdbfe;
         }
+
         .btn-diagnose:active {
             background: #dbeafe;
         }
+
         .btn-edit {
             background: #f8fafc;
             color: #475569;
             border-color: #e2e8f0;
         }
+
         .btn-edit:active {
             background: #e2e8f0;
         }
+
         .btn-delete {
             background: #fef2f2;
             color: #dc2626;
             border-color: #fecaca;
         }
+
         .btn-delete:active {
             background: #fee2e2;
         }
@@ -352,8 +391,9 @@
             color: #64748b;
             font-size: 0.9em;
         }
+
         .spinner {
-            border: 3px solid rgba(0,0,0,0.1);
+            border: 3px solid rgba(0, 0, 0, 0.1);
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -361,10 +401,17 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 12px;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
+
         .empty-state {
             text-align: center;
             padding: 40px 16px;
@@ -387,7 +434,7 @@
             font-size: 0.88em;
             font-weight: 600;
             z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             display: none;
             backdrop-filter: blur(4px);
         }
@@ -395,7 +442,10 @@
         /* Modal 編輯彈窗 */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(2px);
             z-index: 1000;
@@ -404,6 +454,7 @@
             justify-content: center;
             padding: 16px;
         }
+
         .modal-box {
             background: white;
             width: 100%;
@@ -412,16 +463,19 @@
             padding: 20px;
             box-shadow: var(--shadow-md);
         }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 14px;
         }
+
         .modal-header h3 {
             font-size: 1.1em;
             color: #0f172a;
         }
+
         .modal-close {
             background: none;
             border: none;
@@ -429,11 +483,13 @@
             color: #94a3b8;
             cursor: pointer;
         }
+
         .modal-actions {
             display: flex;
             gap: 10px;
             margin-top: 18px;
         }
+
         .modal-btn {
             flex: 1;
             padding: 10px;
@@ -443,248 +499,256 @@
             border: none;
             cursor: pointer;
         }
+
         .modal-btn-cancel {
             background: #f1f5f9;
             color: #475569;
         }
+
         .modal-btn-save {
             background: var(--primary-color);
             color: white;
         }
     </style>
 </head>
+
 <body>
 
-<div id="custom-toast">提示訊息</div>
+    <div id="custom-toast">提示訊息</div>
 
-<div class="container">
-    <!-- 使用者資訊卡片 -->
-    <div class="user-card" id="user-card">
-        <img id="user-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='46' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="Avatar">
-        <div class="user-details">
-            <div class="user-name" id="user-name">連線中...</div>
-            <div class="user-sub" id="user-sub">Firestore 美股雲端同步 (us_items)</div>
-        </div>
-        <div class="stats-badge" id="stats-badge">0 檔追蹤</div>
-    </div>
-
-    <!-- 標題 -->
-    <div class="header-title">
-        <h2>🇺🇸 美股觀察名單</h2>
-    </div>
-
-    <!-- 新增股票表單 -->
-    <div class="form-card">
-        <div class="form-card-title">
-            <span>➕ 新增美股標的</span>
+    <div class="container">
+        <!-- 使用者資訊卡片 -->
+        <div class="user-card" id="user-card">
+            <img id="user-avatar"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='46' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E"
+                alt="Avatar">
+            <div class="user-details">
+                <div class="user-name" id="user-name">連線中...</div>
+                <div class="user-sub" id="user-sub">Firestore 美股雲端同步 (us_items)</div>
+            </div>
+            <div class="stats-badge" id="stats-badge">0 檔追蹤</div>
         </div>
 
-        <!-- 熱門標的快捷點選 -->
-        <div class="quick-chips-wrap">
-            <div class="quick-chips-title">🔥 快速填入熱門美股 / ETF：</div>
-            <div class="quick-chips">
-                <span class="chip" onclick="fillQuickStock('NVDA', '輝達 (NVIDIA)', 'AI算力龍頭')">NVDA 輝達</span>
-                <span class="chip" onclick="fillQuickStock('AAPL', '蘋果 (Apple)', '消費電子巨頭')">AAPL 蘋果</span>
-                <span class="chip" onclick="fillQuickStock('TSLA', '特斯拉 (Tesla)', '電動車與能源')">TSLA 特斯拉</span>
-                <span class="chip" onclick="fillQuickStock('MSFT', '微軟 (Microsoft)', '雲端與企業軟體')">MSFT 微軟</span>
-                <span class="chip" onclick="fillQuickStock('GOOGL', 'Alphabet (Google)', '搜尋與AI大模型')">GOOGL 谷歌</span>
-                <span class="chip" onclick="fillQuickStock('AMZN', '亞馬遜 (Amazon)', '電商與AWS雲端')">AMZN 亞馬遜</span>
-                <span class="chip" onclick="fillQuickStock('META', 'Meta (臉書)', '社群與開源AI')">META 臉書</span>
-                <span class="chip" onclick="fillQuickStock('QQQ', 'Invesco 納斯達克100 ETF', '科技大盤ETF')">QQQ 納指100</span>
-                <span class="chip" onclick="fillQuickStock('SPY', 'SPDR 標普500 ETF', '美股核心大盤')">SPY 標普500</span>
-                <span class="chip" onclick="fillQuickStock('TSM', '台積電 ADR', '全球晶圓代工霸主')">TSM 台積電ADR</span>
+        <!-- 標題 -->
+        <div class="header-title">
+            <h2>🇺🇸 美股觀察名單</h2>
+        </div>
+
+        <!-- 新增股票表單 -->
+        <div class="form-card">
+            <div class="form-card-title">
+                <span>➕ 新增美股標的</span>
+            </div>
+
+            <!-- 熱門標的快捷點選 -->
+            <div class="quick-chips-wrap">
+                <div class="quick-chips-title">🔥 快速填入熱門美股 / ETF：</div>
+                <div class="quick-chips">
+                    <span class="chip" onclick="fillQuickStock('NVDA', '輝達 (NVIDIA)', 'AI算力龍頭')">NVDA 輝達</span>
+                    <span class="chip" onclick="fillQuickStock('AAPL', '蘋果 (Apple)', '消費電子巨頭')">AAPL 蘋果</span>
+                    <span class="chip" onclick="fillQuickStock('TSLA', '特斯拉 (Tesla)', '電動車與能源')">TSLA 特斯拉</span>
+                    <span class="chip" onclick="fillQuickStock('MSFT', '微軟 (Microsoft)', '雲端與企業軟體')">MSFT 微軟</span>
+                    <span class="chip" onclick="fillQuickStock('GOOGL', 'Alphabet (Google)', '搜尋與AI大模型')">GOOGL
+                        谷歌</span>
+                    <span class="chip" onclick="fillQuickStock('AMZN', '亞馬遜 (Amazon)', '電商與AWS雲端')">AMZN 亞馬遜</span>
+                    <span class="chip" onclick="fillQuickStock('META', 'Meta (臉書)', '社群與開源AI')">META 臉書</span>
+                    <span class="chip" onclick="fillQuickStock('QQQ', 'Invesco 納斯達克100 ETF', '科技大盤ETF')">QQQ
+                        納指100</span>
+                    <span class="chip" onclick="fillQuickStock('SPY', 'SPDR 標普500 ETF', '美股核心大盤')">SPY 標普500</span>
+                    <span class="chip" onclick="fillQuickStock('TSM', '台積電 ADR', '全球晶圓代工霸主')">TSM 台積電ADR</span>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-col input-col-code">
+                    <label for="stockCode">美股代號 *</label>
+                    <input type="text" id="stockCode" placeholder="例如 NVDA, AAPL" maxlength="10"
+                        oninput="autoLookupName(this.value)">
+                </div>
+                <div class="input-col input-col-name">
+                    <label for="stockName">公司名稱 (選填)</label>
+                    <input type="text" id="stockName" placeholder="例如 輝達">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label for="stockNote">投資筆記 / 策略備註 (選填)</label>
+                <input type="text" id="stockNote" placeholder="例如：長期定期定額、AI主力持股、長線看好">
+            </div>
+
+            <button class="btn-add" id="btnAdd" onclick="handleAddStock()">
+                <span>＋ 加入美股觀察清單</span>
+            </button>
+        </div>
+
+        <!-- 搜尋與名單列 -->
+        <div class="list-header">
+            <div class="list-title">
+                <span>📋 我的自選美股</span>
             </div>
         </div>
 
-        <div class="input-row">
-            <div class="input-col input-col-code">
-                <label for="stockCode">美股代號 *</label>
-                <input type="text" id="stockCode" placeholder="例如 NVDA, AAPL" maxlength="10" oninput="autoLookupName(this.value)">
+        <!-- 搜尋框 -->
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchFilter" placeholder="搜尋美股代號或名稱..." oninput="handleSearch(this.value)">
+        </div>
+
+        <!-- 清單容器 -->
+        <div id="stock-list-container">
+            <div class="loading-wrap">
+                <div class="spinner"></div>
+                <div>正在載入您的美股自選清單...</div>
             </div>
-            <div class="input-col input-col-name">
-                <label for="stockName">公司名稱 (選填)</label>
-                <input type="text" id="stockName" placeholder="例如 輝達">
+        </div>
+    </div>
+
+    <!-- 編輯 Modal 彈窗 -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalStockTitle">✏️ 編輯美股資訊</h3>
+                <button class="modal-close" onclick="closeEditModal()">✕</button>
+            </div>
+            <input type="hidden" id="editStockCode">
+            <div style="margin-bottom: 12px;">
+                <label>股票名稱</label>
+                <input type="text" id="editStockName" placeholder="英文或中文名稱">
+            </div>
+            <div style="margin-bottom: 14px;">
+                <label>投資筆記 / 備註</label>
+                <input type="text" id="editStockNote" placeholder="自訂備註說明">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeEditModal()">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="handleSaveEdit()">儲存更新</button>
             </div>
         </div>
-
-        <div style="margin-bottom: 14px;">
-            <label for="stockNote">投資筆記 / 策略備註 (選填)</label>
-            <input type="text" id="stockNote" placeholder="例如：長期定期定額、AI主力持股、長線看好">
-        </div>
-
-        <button class="btn-add" id="btnAdd" onclick="handleAddStock()">
-            <span>＋ 加入美股觀察清單</span>
-        </button>
     </div>
 
-    <!-- 搜尋與名單列 -->
-    <div class="list-header">
-        <div class="list-title">
-            <span>📋 我的自選美股</span>
-        </div>
-    </div>
+    <script>
+        // ==========================================
+        // ⚙️ LIFF 與 API 基礎設定
+        // 請於建立 LINE 美股 LIFF 後替換 LIFF_ID
+        // ==========================================
+        const LIFF_ID = "2008963829-BSaV76Dk"; // 若有獨立美股 LIFF ID 請填入此處
+        const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api";
 
-    <!-- 搜尋框 -->
-    <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchFilter" placeholder="搜尋美股代號或名稱..." oninput="handleSearch(this.value)">
-    </div>
+        let currentUserId = "";
+        let rawWatchlist = [];
 
-    <!-- 清單容器 -->
-    <div id="stock-list-container">
-        <div class="loading-wrap">
-            <div class="spinner"></div>
-            <div>正在載入您的美股自選清單...</div>
-        </div>
-    </div>
-</div>
+        // 熱門美股常用名稱對照表
+        const POPULAR_STOCKS = {
+            "NVDA": "輝達 (NVIDIA)",
+            "AAPL": "蘋果 (Apple)",
+            "TSLA": "特斯拉 (Tesla)",
+            "MSFT": "微軟 (Microsoft)",
+            "GOOGL": "Alphabet (Google)",
+            "AMZN": "亞馬遜 (Amazon)",
+            "META": "Meta (臉書)",
+            "TSM": "台積電 ADR",
+            "AMD": "超微 (AMD)",
+            "AVGO": "博通 (Broadcom)",
+            "INTC": "英特爾 (Intel)",
+            "NFLX": "網飛 (Netflix)",
+            "SPY": "SPDR 標普500 ETF",
+            "QQQ": "Invesco 納指100 ETF",
+            "VOO": "Vanguard 標普500 ETF",
+            "SOXX": "iShares 費半半導體 ETF"
+        };
 
-<!-- 編輯 Modal 彈窗 -->
-<div class="modal-overlay" id="editModal">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3 id="modalStockTitle">✏️ 編輯美股資訊</h3>
-            <button class="modal-close" onclick="closeEditModal()">✕</button>
-        </div>
-        <input type="hidden" id="editStockCode">
-        <div style="margin-bottom: 12px;">
-            <label>股票名稱</label>
-            <input type="text" id="editStockName" placeholder="英文或中文名稱">
-        </div>
-        <div style="margin-bottom: 14px;">
-            <label>投資筆記 / 備註</label>
-            <input type="text" id="editStockNote" placeholder="自訂備註說明">
-        </div>
-        <div class="modal-actions">
-            <button class="modal-btn modal-btn-cancel" onclick="closeEditModal()">取消</button>
-            <button class="modal-btn modal-btn-save" onclick="handleSaveEdit()">儲存更新</button>
-        </div>
-    </div>
-</div>
+        // ==========================================
+        // 💬 提示訊息與 Toast
+        // ==========================================
+        function showToast(msg, duration = 2200) {
+            const toast = document.getElementById('custom-toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, duration);
+        }
 
-<script>
-    // ==========================================
-    // ⚙️ LIFF 與 API 基礎設定
-    // 請於建立 LINE 美股 LIFF 後替換 LIFF_ID
-    // ==========================================
-    const LIFF_ID = "2008963829-tIljVU3d"; // 若有獨立美股 LIFF ID 請填入此處
-    const API_URL = "https://asia-east1-tim-chatting-project.cloudfunctions.net/tim-chatting-project/liff_api"; 
+        // ==========================================
+        // 🚀 初始化 App (LIFF)
+        // ==========================================
+        async function initApp() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
+                    const profile = await liff.getProfile();
+                    currentUserId = profile.userId;
 
-    let currentUserId = "";
-    let rawWatchlist = [];
-
-    // 熱門美股常用名稱對照表
-    const POPULAR_STOCKS = {
-        "NVDA": "輝達 (NVIDIA)",
-        "AAPL": "蘋果 (Apple)",
-        "TSLA": "特斯拉 (Tesla)",
-        "MSFT": "微軟 (Microsoft)",
-        "GOOGL": "Alphabet (Google)",
-        "AMZN": "亞馬遜 (Amazon)",
-        "META": "Meta (臉書)",
-        "TSM": "台積電 ADR",
-        "AMD": "超微 (AMD)",
-        "AVGO": "博通 (Broadcom)",
-        "INTC": "英特爾 (Intel)",
-        "NFLX": "網飛 (Netflix)",
-        "SPY": "SPDR 標普500 ETF",
-        "QQQ": "Invesco 納指100 ETF",
-        "VOO": "Vanguard 標普500 ETF",
-        "SOXX": "iShares 費半半導體 ETF"
-    };
-
-    // ==========================================
-    // 💬 提示訊息與 Toast
-    // ==========================================
-    function showToast(msg, duration = 2200) {
-        const toast = document.getElementById('custom-toast');
-        toast.innerText = msg;
-        toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, duration);
-    }
-
-    // ==========================================
-    // 🚀 初始化 App (LIFF)
-    // ==========================================
-    async function initApp() {
-        try {
-            await liff.init({ liffId: LIFF_ID });
-            if (!liff.isLoggedIn()) {
-                liff.login();
-            } else {
-                const profile = await liff.getProfile();
-                currentUserId = profile.userId;
-
-                document.getElementById('user-name').innerText = `哈囉，${profile.displayName}！`;
-                if (profile.pictureUrl) {
-                    document.getElementById('user-avatar').src = profile.pictureUrl;
+                    document.getElementById('user-name').innerText = `哈囉，${profile.displayName}！`;
+                    if (profile.pictureUrl) {
+                        document.getElementById('user-avatar').src = profile.pictureUrl;
+                    }
+                    loadWatchlist();
                 }
+            } catch (err) {
+                console.error("LIFF Init Error:", err);
+                const urlParams = new URLSearchParams(window.location.search);
+                currentUserId = urlParams.get('user_id') || "test_user_id";
+                document.getElementById('user-name').innerText = "測試模式 (本地)";
                 loadWatchlist();
             }
-        } catch (err) {
-            console.error("LIFF Init Error:", err);
-            const urlParams = new URLSearchParams(window.location.search);
-            currentUserId = urlParams.get('user_id') || "test_user_id";
-            document.getElementById('user-name').innerText = "測試模式 (本地)";
-            loadWatchlist();
         }
-    }
 
-    // ==========================================
-    // 📥 讀取 Firestore 美股清單 (us_items)
-    // ==========================================
-    async function loadWatchlist() {
-        if (!currentUserId) return;
-        const container = document.getElementById('stock-list-container');
-        
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: "get_stock",
-                    user_id: currentUserId,
-                    market: "us"
-                })
-            });
-            const data = await res.json();
-            rawWatchlist = data.list || [];
-            updateStatsBadge(rawWatchlist.length);
-            renderStockList(rawWatchlist);
-        } catch (err) {
-            console.error("Fetch Watchlist Error:", err);
-            container.innerHTML = `
+        // ==========================================
+        // 📥 讀取 Firestore 美股清單 (us_items)
+        // ==========================================
+        async function loadWatchlist() {
+            if (!currentUserId) return;
+            const container = document.getElementById('stock-list-container');
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: "get_stock",
+                        user_id: currentUserId,
+                        market: "us"
+                    })
+                });
+                const data = await res.json();
+                rawWatchlist = data.list || [];
+                updateStatsBadge(rawWatchlist.length);
+                renderStockList(rawWatchlist);
+            } catch (err) {
+                console.error("Fetch Watchlist Error:", err);
+                container.innerHTML = `
                 <div class="empty-state">
                     <div style="font-size: 28px; margin-bottom: 8px;">⚠️</div>
                     <div>連線發生異常，無法取得美股自選資料</div>
                     <button class="btn-add" style="margin-top: 12px; padding: 8px 16px; width: auto;" onclick="loadWatchlist()">重試</button>
                 </div>
             `;
+            }
         }
-    }
 
-    // ==========================================
-    // 🎨 渲染美股列表卡片
-    // ==========================================
-    function renderStockList(stocks) {
-        const container = document.getElementById('stock-list-container');
-        if (!stocks || stocks.length === 0) {
-            container.innerHTML = `
+        // ==========================================
+        // 🎨 渲染美股列表卡片
+        // ==========================================
+        function renderStockList(stocks) {
+            const container = document.getElementById('stock-list-container');
+            if (!stocks || stocks.length === 0) {
+                container.innerHTML = `
                 <div class="empty-state">
                     <div style="font-size: 34px; margin-bottom: 8px;">🇺🇸</div>
                     <div style="font-weight: 700; color: #334155; margin-bottom: 4px;">目前尚無美股觀察標的</div>
                     <div style="font-size: 0.85em;">您可以透過上方輸入代號 (例如 NVDA) 或點選熱門標籤新增！</div>
                 </div>
             `;
-            return;
-        }
+                return;
+            }
 
-        container.innerHTML = stocks.map(item => {
-            const safeCode = escapeHtml(item.code || '');
-            const safeName = escapeHtml(item.name || safeCode);
-            const safeNote = escapeHtml(item.note || '');
+            container.innerHTML = stocks.map(item => {
+                const safeCode = escapeHtml(item.code || '');
+                const safeName = escapeHtml(item.name || safeCode);
+                const safeNote = escapeHtml(item.note || '');
 
-            return `
+                return `
                 <div class="stock-card" id="stock-card-${safeCode}">
                     <div class="stock-card-top">
                         <div class="stock-identity">
@@ -711,205 +775,206 @@
                     </div>
                 </div>
             `;
-        }).join('');
-    }
-
-    // ==========================================
-    // ➕ 新增美股
-    // ==========================================
-    async function handleAddStock() {
-        const codeInput = document.getElementById('stockCode');
-        const nameInput = document.getElementById('stockName');
-        const noteInput = document.getElementById('stockNote');
-        const btnAdd = document.getElementById('btnAdd');
-
-        const code = codeInput.value.trim().toUpperCase();
-        const name = nameInput.value.trim();
-        const note = noteInput.value.trim();
-
-        if (!code) {
-            showToast("⚠️ 請輸入美股代號 (如 NVDA)");
-            codeInput.focus();
-            return;
+            }).join('');
         }
 
-        btnAdd.disabled = true;
-        btnAdd.innerText = "正在儲存...";
+        // ==========================================
+        // ➕ 新增美股
+        // ==========================================
+        async function handleAddStock() {
+            const codeInput = document.getElementById('stockCode');
+            const nameInput = document.getElementById('stockName');
+            const noteInput = document.getElementById('stockNote');
+            const btnAdd = document.getElementById('btnAdd');
 
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: "add_stock",
-                    user_id: currentUserId,
-                    code: code,
-                    name: name || POPULAR_STOCKS[code] || code,
-                    note: note,
-                    market: "us"
-                })
-            });
-            const result = await res.json();
-            if (result.status) {
-                showToast(`✅ 已將 ${code} 加入美股觀察清單！`);
-                codeInput.value = "";
-                nameInput.value = "";
-                noteInput.value = "";
-                loadWatchlist();
-            } else {
-                showToast("❌ 新增失敗，請稍後再試");
+            const code = codeInput.value.trim().toUpperCase();
+            const name = nameInput.value.trim();
+            const note = noteInput.value.trim();
+
+            if (!code) {
+                showToast("⚠️ 請輸入美股代號 (如 NVDA)");
+                codeInput.focus();
+                return;
             }
-        } catch (err) {
-            console.error(err);
-            showToast("❌ 網路請求失敗");
-        } finally {
-            btnAdd.disabled = false;
-            btnAdd.innerText = "＋ 加入美股觀察清單";
-        }
-    }
 
-    // ==========================================
-    // 🗑️ 刪除股票
-    // ==========================================
-    async function handleDeleteStock(code, name) {
-        if (!confirm(`確定要將【${code} ${name}】從美股清單中移除嗎？`)) {
-            return;
-        }
+            btnAdd.disabled = true;
+            btnAdd.innerText = "正在儲存...";
 
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: "delete_stock",
-                    user_id: currentUserId,
-                    code: code,
-                    market: "us"
-                })
-            });
-            const result = await res.json();
-            showToast(`🗑️ 已移除 ${code}`);
-            loadWatchlist();
-        } catch (err) {
-            console.error(err);
-            showToast("❌ 刪除失敗");
-        }
-    }
-
-    // ==========================================
-    // ✏️ 編輯美股 Modal 操作
-    // ==========================================
-    function openEditModal(code, name, note) {
-        document.getElementById('editStockCode').value = code;
-        document.getElementById('editStockName').value = name;
-        document.getElementById('editStockNote').value = note;
-        document.getElementById('modalStockTitle').innerText = `✏️ 編輯 ${code} ${name}`;
-        document.getElementById('editModal').style.display = 'flex';
-    }
-
-    function closeEditModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-
-    async function handleSaveEdit() {
-        const code = document.getElementById('editStockCode').value;
-        const name = document.getElementById('editStockName').value.trim();
-        const note = document.getElementById('editStockNote').value.trim();
-
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: "update_stock",
-                    user_id: currentUserId,
-                    code: code,
-                    name: name,
-                    note: note,
-                    market: "us"
-                })
-            });
-            showToast(`✅ ${code} 更新成功！`);
-            closeEditModal();
-            loadWatchlist();
-        } catch (err) {
-            console.error(err);
-            showToast("❌ 更新失敗");
-        }
-    }
-
-    // ==========================================
-    // 💬 發送即時個股診斷至 LINE (發送美股代號)
-    // ==========================================
-    async function triggerStockDiagnosis(code) {
-        const msgText = `${code}`; // 例如輸入 "NVDA"，機器人會直接回覆美股診斷卡片
-        if (liff.isInClient()) {
             try {
-                await liff.sendMessages([{
-                    type: 'text',
-                    text: msgText
-                }]);
-                showToast(`🚀 已發送【${code}】美股診斷請求！`);
-                setTimeout(() => { liff.closeWindow(); }, 1200);
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: "add_stock",
+                        user_id: currentUserId,
+                        code: code,
+                        name: name || POPULAR_STOCKS[code] || code,
+                        note: note,
+                        market: "us"
+                    })
+                });
+                const result = await res.json();
+                if (result.status) {
+                    showToast(`✅ 已將 ${code} 加入美股觀察清單！`);
+                    codeInput.value = "";
+                    nameInput.value = "";
+                    noteInput.value = "";
+                    loadWatchlist();
+                } else {
+                    showToast("❌ 新增失敗，請稍後再試");
+                }
             } catch (err) {
-                console.warn("sendMessages not allowed or cancelled:", err);
-                showToast(`💡 請在聊天室輸入「${msgText}」即可診斷`);
+                console.error(err);
+                showToast("❌ 網路請求失敗");
+            } finally {
+                btnAdd.disabled = false;
+                btnAdd.innerText = "＋ 加入美股觀察清單";
             }
-        } else {
-            showToast(`💡 聊天室輸入「${msgText}」即可檢視診斷報告`);
         }
-    }
 
-    // ==========================================
-    // 🔍 即時搜尋篩選
-    // ==========================================
-    function handleSearch(keyword) {
-        const term = keyword.trim().toLowerCase();
-        if (!term) {
-            renderStockList(rawWatchlist);
-            return;
+        // ==========================================
+        // 🗑️ 刪除股票
+        // ==========================================
+        async function handleDeleteStock(code, name) {
+            if (!confirm(`確定要將【${code} ${name}】從美股清單中移除嗎？`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: "delete_stock",
+                        user_id: currentUserId,
+                        code: code,
+                        market: "us"
+                    })
+                });
+                const result = await res.json();
+                showToast(`🗑️ 已移除 ${code}`);
+                loadWatchlist();
+            } catch (err) {
+                console.error(err);
+                showToast("❌ 刪除失敗");
+            }
         }
-        const filtered = rawWatchlist.filter(item => {
-            const code = (item.code || '').toLowerCase();
-            const name = (item.name || '').toLowerCase();
-            const note = (item.note || '').toLowerCase();
-            return code.includes(term) || name.includes(term) || note.includes(term);
-        });
-        renderStockList(filtered);
-    }
 
-    // ==========================================
-    // ⚡ 輔助函數
-    // ==========================================
-    function fillQuickStock(code, name, note) {
-        document.getElementById('stockCode').value = code;
-        document.getElementById('stockName').value = name;
-        document.getElementById('stockNote').value = note;
-    }
-
-    function autoLookupName(code) {
-        const clean = code.trim().toUpperCase();
-        const nameInput = document.getElementById('stockName');
-        if (POPULAR_STOCKS[clean] && !nameInput.value) {
-            nameInput.value = POPULAR_STOCKS[clean];
+        // ==========================================
+        // ✏️ 編輯美股 Modal 操作
+        // ==========================================
+        function openEditModal(code, name, note) {
+            document.getElementById('editStockCode').value = code;
+            document.getElementById('editStockName').value = name;
+            document.getElementById('editStockNote').value = note;
+            document.getElementById('modalStockTitle').innerText = `✏️ 編輯 ${code} ${name}`;
+            document.getElementById('editModal').style.display = 'flex';
         }
-    }
 
-    function updateStatsBadge(count) {
-        document.getElementById('stats-badge').innerText = `已追蹤 ${count} 檔`;
-    }
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
 
-    function escapeHtml(str) {
-        return str.replace(/[&<>'"]/g, tag => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            "'": '&#39;',
-            '"': '&quot;'
-        }[tag] || tag));
-    }
+        async function handleSaveEdit() {
+            const code = document.getElementById('editStockCode').value;
+            const name = document.getElementById('editStockName').value.trim();
+            const note = document.getElementById('editStockNote').value.trim();
 
-    window.onload = initApp;
-</script>
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: "update_stock",
+                        user_id: currentUserId,
+                        code: code,
+                        name: name,
+                        note: note,
+                        market: "us"
+                    })
+                });
+                showToast(`✅ ${code} 更新成功！`);
+                closeEditModal();
+                loadWatchlist();
+            } catch (err) {
+                console.error(err);
+                showToast("❌ 更新失敗");
+            }
+        }
+
+        // ==========================================
+        // 💬 發送即時個股診斷至 LINE (發送美股代號)
+        // ==========================================
+        async function triggerStockDiagnosis(code) {
+            const msgText = `${code}`; // 例如輸入 "NVDA"，機器人會直接回覆美股診斷卡片
+            if (liff.isInClient()) {
+                try {
+                    await liff.sendMessages([{
+                        type: 'text',
+                        text: msgText
+                    }]);
+                    showToast(`🚀 已發送【${code}】美股診斷請求！`);
+                    setTimeout(() => { liff.closeWindow(); }, 1200);
+                } catch (err) {
+                    console.warn("sendMessages not allowed or cancelled:", err);
+                    showToast(`💡 請在聊天室輸入「${msgText}」即可診斷`);
+                }
+            } else {
+                showToast(`💡 聊天室輸入「${msgText}」即可檢視診斷報告`);
+            }
+        }
+
+        // ==========================================
+        // 🔍 即時搜尋篩選
+        // ==========================================
+        function handleSearch(keyword) {
+            const term = keyword.trim().toLowerCase();
+            if (!term) {
+                renderStockList(rawWatchlist);
+                return;
+            }
+            const filtered = rawWatchlist.filter(item => {
+                const code = (item.code || '').toLowerCase();
+                const name = (item.name || '').toLowerCase();
+                const note = (item.note || '').toLowerCase();
+                return code.includes(term) || name.includes(term) || note.includes(term);
+            });
+            renderStockList(filtered);
+        }
+
+        // ==========================================
+        // ⚡ 輔助函數
+        // ==========================================
+        function fillQuickStock(code, name, note) {
+            document.getElementById('stockCode').value = code;
+            document.getElementById('stockName').value = name;
+            document.getElementById('stockNote').value = note;
+        }
+
+        function autoLookupName(code) {
+            const clean = code.trim().toUpperCase();
+            const nameInput = document.getElementById('stockName');
+            if (POPULAR_STOCKS[clean] && !nameInput.value) {
+                nameInput.value = POPULAR_STOCKS[clean];
+            }
+        }
+
+        function updateStatsBadge(count) {
+            document.getElementById('stats-badge').innerText = `已追蹤 ${count} 檔`;
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag));
+        }
+
+        window.onload = initApp;
+    </script>
 </body>
+
 </html>
