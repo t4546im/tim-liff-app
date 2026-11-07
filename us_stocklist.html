@@ -675,22 +675,33 @@
                 await liff.init({ liffId: LIFF_ID });
                 if (!liff.isLoggedIn()) {
                     liff.login();
-                } else {
-                    const profile = await liff.getProfile();
-                    currentUserId = profile.userId;
-
-                    document.getElementById('user-name').innerText = `哈囉，${profile.displayName}！`;
-                    if (profile.pictureUrl) {
-                        document.getElementById('user-avatar').src = profile.pictureUrl;
-                    }
-                    loadWatchlist();
+                    return;
                 }
+                const profile = await liff.getProfile();
+                currentUserId = profile.userId;
+
+                document.getElementById('user-name').innerText = `哈囉，${profile.displayName}！`;
+                if (profile.pictureUrl) {
+                    document.getElementById('user-avatar').src = profile.pictureUrl;
+                }
+                loadWatchlist();
             } catch (err) {
                 console.error("LIFF Init Error:", err);
                 const urlParams = new URLSearchParams(window.location.search);
-                currentUserId = urlParams.get('user_id') || "test_user_id";
-                document.getElementById('user-name').innerText = "測試模式 (本地)";
-                loadWatchlist();
+                const paramUid = urlParams.get('user_id');
+                if (paramUid) {
+                    currentUserId = paramUid;
+                    document.getElementById('user-name').innerText = "測試模式 (本地)";
+                    loadWatchlist();
+                } else {
+                    document.getElementById('user-name').innerText = "無法取得身分";
+                    document.getElementById('stock-list-container').innerHTML = `
+                        <div class="empty-state">
+                            <div style="font-size: 28px; margin-bottom: 8px;">⚠️</div>
+                            <div>無法取得您的 LINE 身分，請於 LINE 聊天室中開啟。</div>
+                        </div>
+                    `;
+                }
             }
         }
 
