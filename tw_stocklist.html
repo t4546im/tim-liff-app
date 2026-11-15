@@ -366,14 +366,12 @@
             background: #f8fafc;
             color: #475569;
             border: 1px solid #e2e8f0;
-            max-width: 60px;
         }
 
         .btn-delete {
             background: #fef2f2;
             color: #dc2626;
             border: 1px solid #fecaca;
-            max-width: 60px;
         }
 
         .btn-delete:active {
@@ -552,10 +550,7 @@
                     <span class="chip" onclick="fillQuickStock('2330', '台積電', '晶圓代工龍頭')">2330 台積電</span>
                     <span class="chip" onclick="fillQuickStock('2454', '聯發科', 'IC設計旗艦')">2454 聯發科</span>
                     <span class="chip" onclick="fillQuickStock('2317', '鴻海', 'AI伺服器組裝')">2317 鴻海</span>
-                    <span class="chip" onclick="fillQuickStock('00878', '國泰永續高股息', '季配高股息')">00878 高股息</span>
                     <span class="chip" onclick="fillQuickStock('0050', '元大台灣50', '大盤市值ETF')">0050 台灣50</span>
-                    <span class="chip" onclick="fillQuickStock('00919', '群益精選高息', '高配息ETF')">00919 群益高息</span>
-                    <span class="chip" onclick="fillQuickStock('2603', '長榮', '航運龍頭')">2603 長榮</span>
                 </div>
             </div>
 
@@ -607,18 +602,37 @@
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3 id="modalStockTitle">✏️ 編輯股票資訊</h3>
+                <h3 id="modalStockTitle">2330 台積電</h3>
                 <button class="modal-close" onclick="closeEditModal()">✕</button>
             </div>
             <input type="hidden" id="editStockCode">
+            <input type="hidden" id="editStockName">
+
             <div style="margin-bottom: 12px;">
-                <label>股票名稱</label>
-                <input type="text" id="editStockName" placeholder="股票中文名稱">
+                <label for="editShares">目前股數 (1~100000，選填)</label>
+                <input type="number" id="editShares" placeholder="如 1000" min="1" max="100000" step="1" oninput="togglePositionFields()">
             </div>
+
+            <div class="input-row" style="margin-bottom: 12px;">
+                <div class="input-col">
+                    <label for="editAvgPrice">平均買價 (0~100000)</label>
+                    <input type="number" id="editAvgPrice" placeholder="如 980" min="0" max="100000" step="any" disabled>
+                </div>
+                <div class="input-col">
+                    <label for="editTargetProfit">利得% (1~9999)</label>
+                    <input type="number" id="editTargetProfit" placeholder="如 15" min="1" max="9999" step="any" disabled>
+                </div>
+                <div class="input-col">
+                    <label for="editStopLoss">止損% (1~99)</label>
+                    <input type="number" id="editStopLoss" placeholder="如 7" min="1" max="99" step="any" disabled>
+                </div>
+            </div>
+
             <div style="margin-bottom: 14px;">
-                <label>投資筆記 / 備註</label>
+                <label for="editStockNote">投資筆記 / 備註 (選填)</label>
                 <input type="text" id="editStockNote" placeholder="自訂備註說明">
             </div>
+
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-cancel" onclick="closeEditModal()">取消</button>
                 <button class="modal-btn modal-btn-save" onclick="handleSaveEdit()">儲存更新</button>
@@ -741,7 +755,7 @@
                 return;
             }
 
-            container.innerHTML = stocks.map(item => {
+            container.innerHTML = stocks.map((item, idx) => {
                 const safeCode = escapeHtml(item.code || '');
                 const safeName = escapeHtml(item.name || safeCode);
                 const safeNote = escapeHtml(item.note || '');
@@ -761,10 +775,7 @@
                         </div>
                     ` : ''}
                     <div class="stock-actions">
-                        <button class="btn-action btn-diagnose" onclick="triggerStockDiagnosis('${safeCode}')">
-                            <span>📊 智能診斷</span>
-                        </button>
-                        <button class="btn-action btn-edit" onclick="openEditModal('${safeCode}', '${safeName}', '${safeNote}')">
+                        <button class="btn-action btn-edit" onclick="openEditModalByIndex(${idx})">
                             <span>✏️ 編輯</span>
                         </button>
                         <button class="btn-action btn-delete" onclick="handleDeleteStock('${safeCode}', '${safeName}')">
@@ -861,11 +872,42 @@
         // ==========================================
         // ✏️ 編輯股票 Modal 操作
         // ==========================================
-        function openEditModal(code, name, note) {
+        function togglePositionFields() {
+            const sharesVal = document.getElementById('editShares').value.trim();
+            const hasShares = sharesVal !== '' && Number(sharesVal) > 0;
+            const avgPriceInput = document.getElementById('editAvgPrice');
+            const targetProfitInput = document.getElementById('editTargetProfit');
+            const stopLossInput = document.getElementById('editStopLoss');
+
+            avgPriceInput.disabled = !hasShares;
+            targetProfitInput.disabled = !hasShares;
+            stopLossInput.disabled = !hasShares;
+
+            if (!hasShares) {
+                avgPriceInput.value = '';
+                targetProfitInput.value = '';
+                stopLossInput.value = '';
+            }
+        }
+
+        function openEditModalByIndex(idx) {
+            const item = rawWatchlist[idx] || {};
+            openEditModal(item.code || '', item.name || '', item.note || '', item.shares, item.avg_price, item.target_profit_percent, item.stop_loss_percent);
+        }
+
+        function openEditModal(code, name, note, shares, avgPrice, targetProfit, stopLoss) {
             document.getElementById('editStockCode').value = code;
             document.getElementById('editStockName').value = name;
-            document.getElementById('editStockNote').value = note;
-            document.getElementById('modalStockTitle').innerText = `✏️ 編輯 ${code} ${name}`;
+            document.getElementById('editStockNote').value = note || '';
+
+            document.getElementById('editShares').value = (shares !== undefined && shares !== null) ? shares : '';
+            document.getElementById('editAvgPrice').value = (avgPrice !== undefined && avgPrice !== null) ? avgPrice : '';
+            document.getElementById('editTargetProfit').value = (targetProfit !== undefined && targetProfit !== null) ? targetProfit : '';
+            document.getElementById('editStopLoss').value = (stopLoss !== undefined && stopLoss !== null) ? stopLoss : '';
+
+            togglePositionFields();
+
+            document.getElementById('modalStockTitle').innerText = `${code} ${name}`;
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -878,18 +920,70 @@
             const name = document.getElementById('editStockName').value.trim();
             const note = document.getElementById('editStockNote').value.trim();
 
+            const sharesRaw = document.getElementById('editShares').value.trim();
+            const avgPriceRaw = document.getElementById('editAvgPrice').value.trim();
+            const targetProfitRaw = document.getElementById('editTargetProfit').value.trim();
+            const stopLossRaw = document.getElementById('editStopLoss').value.trim();
+
+            let shares = null;
+            let avgPrice = null;
+            let targetProfit = null;
+            let stopLoss = null;
+
+            if (sharesRaw !== '') {
+                const s = Number(sharesRaw);
+                if (isNaN(s) || s < 1 || s > 100000 || !Number.isInteger(s)) {
+                    showToast("❌ 目前股數需為 1 ~ 100,000 的整數");
+                    return;
+                }
+                shares = s;
+
+                if (avgPriceRaw !== '') {
+                    const ap = Number(avgPriceRaw);
+                    if (isNaN(ap) || ap < 0 || ap > 100000) {
+                        showToast("❌ 平均買價需介於 0 ~ 100,000");
+                        return;
+                    }
+                    avgPrice = ap;
+                }
+
+                if (targetProfitRaw !== '') {
+                    const tp = Number(targetProfitRaw);
+                    if (isNaN(tp) || tp < 1 || tp > 9999) {
+                        showToast("❌ 利得% 需介於 1 ~ 9999");
+                        return;
+                    }
+                    targetProfit = tp;
+                }
+
+                if (stopLossRaw !== '') {
+                    const sl = Number(stopLossRaw);
+                    if (isNaN(sl) || sl < 1 || sl > 99) {
+                        showToast("❌ 止損% 需介於 1 ~ 99");
+                        return;
+                    }
+                    stopLoss = sl;
+                }
+            }
+
             try {
+                const payload = {
+                    action: "update_stock",
+                    user_id: currentUserId,
+                    code: code,
+                    name: name,
+                    note: note,
+                    market: "tw",
+                    shares: shares,
+                    avg_price: avgPrice,
+                    target_profit_percent: targetProfit,
+                    stop_loss_percent: stopLoss
+                };
+
                 const res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: "update_stock",
-                        user_id: currentUserId,
-                        code: code,
-                        name: name,
-                        note: note,
-                        market: "tw"
-                    })
+                    body: JSON.stringify(payload)
                 });
                 showToast(`✅ ${code} 更新成功！`);
                 closeEditModal();
